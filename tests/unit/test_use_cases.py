@@ -5,12 +5,14 @@ from typing import List, Optional
 from src.domain.entities.document import Document
 from src.domain.entities.audio_track import AudioTrack
 from src.domain.entities.voice import VoiceOption
+from src.domain.entities.playback_session import PlaybackSession
 from src.domain.ports.document_source_port import IDocumentSource
 from src.domain.ports.tts_engine_port import ITtsEngine
 from src.domain.ports.audio_player_port import IAudioPlayer
 from src.application.dtos.tts_dtos import ReadAndSpeakRequest
 from src.application.use_cases.read_and_speak_use_case import ReadAndSpeakUseCase
 from src.application.use_cases.list_voices_use_case import ListVoicesUseCase
+from src.application.use_cases.manage_playback_use_case import ManagePlaybackUseCase
 
 class MockDocumentSource(IDocumentSource):
     def can_handle(self, source_identifier: str) -> bool:
@@ -38,12 +40,40 @@ class MockTtsEngine(ITtsEngine):
 class MockAudioPlayer(IAudioPlayer):
     def __init__(self):
         self.played = False
+        self.sessions: List[PlaybackSession] = []
 
     def is_available(self) -> bool:
         return True
 
-    def play(self, audio_track: AudioTrack) -> None:
+    def play(self, audio_track: AudioTrack, blocking: bool = False) -> PlaybackSession:
         self.played = True
+        session = PlaybackSession(
+            session_id="mock_session_1",
+            file_path=audio_track.file_path,
+            title=audio_track.file_path.stem,
+            started_at="2026-09-03 22:00:00",
+            is_active=True,
+            pid=99999
+        )
+        self.sessions.append(session)
+        return session
+
+    def stop(self, session_id: Optional[str] = None) -> bool:
+        if not self.sessions:
+            return False
+        if session_id:
+            self.sessions = [s for s in self.sessions if s.session_id != session_id]
+            return True
+        self.sessions.pop()
+        return True
+
+    def stop_all(self) -> int:
+        count = len(self.sessions)
+        self.sessions.clear()
+        return count
+
+    def get_active_sessions(self) -> List[PlaybackSession]:
+        return list(self.sessions)
 
 @pytest.mark.asyncio
 async def test_read_and_speak_use_case_success():
@@ -76,3 +106,28 @@ async def test_list_voices_use_case():
     voices = await use_case.execute(locale_prefix="vi")
     assert len(voices) == 2
     assert voices[0].voice_id == "vi-VN-HoaiMyNeural"
+
+def test_manage_playback_use_case():
+    player = MockAudioPlayer()
+    use_case = ManagePlaybackUseCase(audio_player=player)
+
+    # Ban đầu không có session
+    assert len(use_case.get_active_sessions()) == 0
+
+    # Phát thử 1 bài
+    track = AudioTrack(file_path=Path("/tmp/test_song.mp3"))
+    session = use_case.play_audio(track)
+    assert session.session_id == "mock_session_1"
+    assert session.filename == "test_song.mp3"
+    assert len(use_case.get_active_sessions()) == 1
+
+    # Dừng bài
+    stopped = use_case.stop_playback(session.session_id)
+    assert stopped is True
+    assert len(use_case.get_active_sessions()) == 0
+
+    # Dừng tất cả
+    use_case.play_audio(track)
+    count = use_case.stop_all_playbacks()
+    assert count == 1
+    assert len(use_case.get_active_sessions()) == 0

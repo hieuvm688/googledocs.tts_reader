@@ -50,6 +50,17 @@ Hệ thống sẽ tự động kích hoạt môi trường ảo `.venv`, khởi 
 - Tìm kiếm theo tên tài liệu.
 - Nghe lại ngay, tải xuống MP3, phát loa Mac hoặc xóa file khỏi ổ đĩa.
 
+### F. Quản Lý Audio Đang Mở & Tắt Audio Chạy Nền (Active Audio Sessions & Kill Switch)
+Tính năng mới giúp bạn giám sát và làm chủ hoàn toàn các luồng âm thanh phát ra loa máy Mac:
+- **Thanh Sidebar - Tab "Audio Đang Phát":**
+  - Hiển thị badge nhấp nháy màu đỏ/hồng (`pulse-active`) báo số lượng audio đang phát ngầm.
+  - Khi bấm vào tab này, bạn sẽ thấy danh sách chi tiết từng tiến trình âm thanh đang chạy kèm mã định danh, PID trên macOS, tên tệp và thời điểm bắt đầu.
+- **Tắt từng audio hoặc tắt toàn bộ:**
+  - Nút **"⏹️ Tắt audio này"**: Dừng ngay lập tức tiến trình của tệp âm thanh cụ thể.
+  - Nút **"⏹️ Dừng tất cả audio nền"**: Lệnh Kill Switch quét sạch và dừng toàn bộ các tiến trình `afplay` đang chạy dưới nền trên máy macOS.
+- **Banner cảnh báo thông minh:** Khi có bất kỳ audio nào đang chạy nền, một thanh thông báo nổi bật sẽ xuất hiện ngay dưới thanh tiêu đề cho phép xem nhanh hoặc "Dừng tất cả" với 1 click.
+- **Nút Loa Mac tự đổi trạng thái:** Tại thanh Audio Player và Thư viện, khi tệp đang phát ra loa Mac, nút sẽ chuyển thành nút đỏ phát sáng **"⏹️ Dừng loa Mac"** để bạn dừng ngay mà không cần rời màn hình.
+
 ---
 
 ## 3. Sử Dụng Qua Dòng Lệnh Terminal (CLI)
@@ -85,6 +96,22 @@ Nếu muốn sử dụng trực tiếp trên Terminal:
 ### E. Chế độ tương tác từng bước (Interactive Mode):
 ```bash
 ./run.sh interactive
+```
+
+### F. Quản lý các audio đang mở / chạy ngầm trên máy:
+```bash
+./run.sh sessions
+# Hoặc: python main.py sessions
+```
+Hiển thị bảng chi tiết các phiên audio đang phát gồm Session ID, PID, tên file và thời gian bắt đầu.
+
+### G. Dừng các audio đang chạy ngầm ra loa Mac:
+```bash
+# Dừng toàn bộ các audio đang chạy ngầm trên máy:
+./run.sh stop
+
+# Dừng một phiên audio cụ thể:
+./run.sh stop --session <SESSION_ID>
 ```
 
 ---

@@ -59,3 +59,38 @@ def test_raw_text_adapter_empty():
     adapter = RawTextAdapter()
     with pytest.raises(DocumentFetchError):
         adapter.fetch_document("text://   ")
+
+from src.infrastructure.audio_players.mac_afplay_adapter import MacAfplayAdapter
+from src.domain.entities.audio_track import AudioTrack
+from src.domain.exceptions.base import AudioPlaybackError
+
+def test_mac_afplay_adapter_play_and_stop(tmp_path):
+    fake_audio = tmp_path / "song.mp3"
+    fake_audio.write_bytes(b"fake audio data")
+
+    adapter = MacAfplayAdapter(executable_path="/usr/bin/afplay")
+    mock_proc = MagicMock()
+    mock_proc.pid = 1234
+    mock_proc.poll.return_value = None
+
+    with patch("shutil.which", return_value="/usr/bin/afplay"):
+        with patch("subprocess.Popen", return_value=mock_proc):
+            track = AudioTrack(file_path=fake_audio)
+            session = adapter.play(track, blocking=False)
+            assert session.pid == 1234
+            assert session.file_name == "song.mp3"
+
+            active = adapter.get_active_sessions()
+            assert any(s.session_id == session.session_id for s in active)
+
+            stopped = adapter.stop(session.session_id)
+            assert stopped is True
+            mock_proc.terminate.assert_called_once()
+
+def test_mac_afplay_adapter_file_not_found(tmp_path):
+    non_existent = tmp_path / "not_found.mp3"
+    adapter = MacAfplayAdapter(executable_path="/usr/bin/afplay")
+    track = AudioTrack(file_path=non_existent)
+    with pytest.raises(AudioPlaybackError):
+        adapter.play(track)
+

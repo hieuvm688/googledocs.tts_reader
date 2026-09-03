@@ -122,3 +122,29 @@ async def test_stop_endpoint():
         # Stop một job không tồn tại -> 404 hoặc stopped
         resp = await client.post("/api/stop", json={"job_id": "fake_job_123"})
         assert resp.status in [200, 404]
+
+@pytest.mark.asyncio
+async def test_playback_endpoints():
+    app = build_web_app()
+    async with TestClient(TestServer(app)) as client:
+        # 1. Lấy danh sách sessions ban đầu
+        resp = await client.get("/api/playback/sessions")
+        assert resp.status == 200
+        data = await resp.json()
+        assert data["status"] == "success"
+        assert isinstance(data["data"], list)
+
+        # 2. Stop non-existent session
+        stop_resp = await client.post("/api/playback/stop", json={"session_id": "non_existent_sess"})
+        assert stop_resp.status == 404
+
+        # 3. Stop all playbacks
+        stop_all_resp = await client.post("/api/playback/stop-all")
+        assert stop_all_resp.status == 200
+        all_data = await stop_all_resp.json()
+        assert all_data["status"] == "success"
+        assert "stopped_count" in all_data
+
+        # 4. Play mac with non-existent file -> 404
+        play_resp = await client.post("/api/play-mac", json={"filename": "non_existent.mp3"})
+        assert play_resp.status == 404

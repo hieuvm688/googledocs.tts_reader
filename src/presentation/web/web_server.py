@@ -24,6 +24,7 @@ from src.infrastructure.audio_players.mac_afplay_adapter import MacAfplayAdapter
 from src.application.dtos.tts_dtos import ReadAndSpeakRequest
 from src.application.use_cases.read_and_speak_use_case import ReadAndSpeakUseCase
 from src.application.use_cases.list_voices_use_case import ListVoicesUseCase
+from src.application.use_cases.manage_playback_use_case import ManagePlaybackUseCase
 
 console = Console()
 
@@ -37,7 +38,7 @@ OUTPUT_AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def create_web_container() -> Tuple[ReadAndSpeakUseCase, ListVoicesUseCase, MacAfplayAdapter]:
+def create_web_container() -> Tuple[ReadAndSpeakUseCase, ListVoicesUseCase, ManagePlaybackUseCase, MacAfplayAdapter]:
     """Dependency Injection Container cho tầng Web Presentation."""
     doc_sources = [
         GoogleDocsUrlAdapter(),
@@ -53,8 +54,9 @@ def create_web_container() -> Tuple[ReadAndSpeakUseCase, ListVoicesUseCase, MacA
         audio_player=audio_player
     )
     list_voices_uc = ListVoicesUseCase(tts_engine=tts_engine)
+    manage_playback_uc = ManagePlaybackUseCase(audio_player=audio_player)
 
-    return read_and_speak_uc, list_voices_uc, audio_player
+    return read_and_speak_uc, list_voices_uc, manage_playback_uc, audio_player
 
 
 class WebTtsController:
@@ -64,10 +66,12 @@ class WebTtsController:
         self,
         read_and_speak_uc: ReadAndSpeakUseCase,
         list_voices_uc: ListVoicesUseCase,
+        manage_playback_uc: ManagePlaybackUseCase,
         audio_player: MacAfplayAdapter
     ):
         self._read_and_speak_uc = read_and_speak_uc
         self._list_voices_uc = list_voices_uc
+        self._manage_playback_uc = manage_playback_uc
         self._audio_player = audio_player
         self._active_jobs: Dict[str, asyncio.Task] = {}
         self._job_metadata: Dict[str, dict] = {}
@@ -364,7 +368,7 @@ class WebTtsController:
         })
 
     async def post_play_mac(self, request: web.Request) -> web.Response:
-        """API phát âm thanh ra loa máy Mac thông qua afplay."""
+        """API phát âm thanh ra loa máy Mac thông qua afplay (bất đồng bộ, không nghẽn server)."""
         try:
             body = await request.json()
             filename = body.get("filename", "")
@@ -375,8 +379,68 @@ class WebTtsController:
                 return web.json_response({"status": "error", "message": "Tệp âm thanh không tồn tại."}, status=404)
 
             track = AudioTrack(file_path=file_path)
-            self._audio_player.play(track)
-            return web.json_response({"status": "success", "message": "Đang phát qua loa máy Mac."})
+            session_dto = self._manage_playback_uc.play_audio(track, blocking=False)
+            return web.json_response({
+                "status": "success",
+                "message": "Đang phát qua loa máy Mac.",
+                "data": {
+                    "session_id": session_dto.session_id,
+                    "filename": session_dto.filename,
+                    "title": session_dto.title,
+                    "started_at": session_dto.started_at,
+                    "pid": session_dto.pid
+                }
+            })
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": str(exc)}, status=500)
+
+    async def get_playback_sessions(self, request: web.Request) -> web.Response:
+        """API lấy danh sách các phiên phát âm thanh đang hoạt động."""
+        try:
+            sessions = self._manage_playback_uc.get_active_sessions()
+            data = [
+                {
+                    "session_id": s.session_id,
+                    "filename": s.filename,
+                    "file_path": s.file_path,
+                    "title": s.title,
+                    "started_at": s.started_at,
+                    "is_active": s.is_active,
+                    "pid": s.pid
+                }
+                for s in sessions
+            ]
+            return web.json_response({"status": "success", "data": data})
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": str(exc)}, status=500)
+
+    async def post_stop_playback(self, request: web.Request) -> web.Response:
+        """API dừng một phiên phát âm thanh cụ thể hoặc phiên gần nhất."""
+        try:
+            session_id = None
+            if request.can_read_body:
+                body = await request.json()
+                session_id = body.get("session_id")
+        except Exception:
+            session_id = None
+
+        try:
+            stopped = self._manage_playback_uc.stop_playback(session_id=session_id)
+            if stopped:
+                return web.json_response({"status": "success", "message": "Đã dừng phát âm thanh thành công."})
+            return web.json_response({"status": "not_found", "message": "Không tìm thấy phiên phát âm thanh nào đang chạy."}, status=404)
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": str(exc)}, status=500)
+
+    async def post_stop_all_playback(self, request: web.Request) -> web.Response:
+        """API dừng toàn bộ các tiến trình phát âm thanh đang chạy dưới nền."""
+        try:
+            stopped_count = self._manage_playback_uc.stop_all_playbacks()
+            return web.json_response({
+                "status": "success",
+                "stopped_count": stopped_count,
+                "message": f"Đã dừng {stopped_count} phiên phát âm thanh đang chạy nền."
+            })
         except Exception as exc:
             return web.json_response({"status": "error", "message": str(exc)}, status=500)
 
@@ -387,8 +451,8 @@ class WebTtsController:
 
 def build_web_app() -> web.Application:
     """Xây dựng ứng dụng aiohttp web với đầy đủ router và DI."""
-    read_and_speak_uc, list_voices_uc, audio_player = create_web_container()
-    controller = WebTtsController(read_and_speak_uc, list_voices_uc, audio_player)
+    read_and_speak_uc, list_voices_uc, manage_playback_uc, audio_player = create_web_container()
+    controller = WebTtsController(read_and_speak_uc, list_voices_uc, manage_playback_uc, audio_player)
 
     app = web.Application(client_max_size=50 * 1024 * 1024)  # 50MB max file upload
 
@@ -401,6 +465,9 @@ def build_web_app() -> web.Application:
     app.router.add_delete("/api/audio/{filename}", controller.delete_audio)
     app.router.add_get("/api/audio/{filename}", controller.get_audio)
     app.router.add_post("/api/play-mac", controller.post_play_mac)
+    app.router.add_get("/api/playback/sessions", controller.get_playback_sessions)
+    app.router.add_post("/api/playback/stop", controller.post_stop_playback)
+    app.router.add_post("/api/playback/stop-all", controller.post_stop_all_playback)
 
     # Static UI routes
     app.router.add_get("/", controller.get_index)
@@ -429,7 +496,8 @@ def run_web_server(host: str = "127.0.0.1", port: int = 8000, open_browser: bool
     console.print(f"[dim]Bấm Ctrl+C trên terminal để dừng server bất kỳ lúc nào.[/dim]\n")
 
     if open_browser:
-        loop = asyncio.get_event_loop()
-        loop.create_task(start_background_browser(url))
+        async def _on_startup_open_browser(app_instance):
+            asyncio.create_task(start_background_browser(url))
+        app.on_startup.append(_on_startup_open_browser)
 
     web.run_app(app, host=host, port=port, print=None)

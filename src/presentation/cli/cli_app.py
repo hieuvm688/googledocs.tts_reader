@@ -17,6 +17,7 @@ from src.infrastructure.audio_players.mac_afplay_adapter import MacAfplayAdapter
 from src.application.dtos.tts_dtos import ReadAndSpeakRequest
 from src.application.use_cases.read_and_speak_use_case import ReadAndSpeakUseCase
 from src.application.use_cases.list_voices_use_case import ListVoicesUseCase
+from src.application.use_cases.manage_playback_use_case import ManagePlaybackUseCase
 
 console = Console()
 
@@ -36,8 +37,9 @@ def create_container():
         audio_player=audio_player
     )
     list_voices_uc = ListVoicesUseCase(tts_engine=tts_engine)
+    manage_playback_uc = ManagePlaybackUseCase(audio_player=audio_player)
 
-    return read_and_speak_uc, list_voices_uc
+    return read_and_speak_uc, list_voices_uc, manage_playback_uc
 
 async def handle_read(args, read_and_speak_uc: ReadAndSpeakUseCase):
     source = args.url or args.file
@@ -134,6 +136,40 @@ async def handle_interactive(read_and_speak_uc: ReadAndSpeakUseCase):
                 border_style="red"
             ))
 
+def handle_sessions(manage_playback_uc: ManagePlaybackUseCase):
+    sessions = manage_playback_uc.get_active_sessions()
+    if not sessions:
+        console.print("[dim green]✅ Hiện tại không có audio nào đang mở hoặc chạy ngầm trên máy.[/dim green]")
+        return
+
+    table = Table(title="🔊 CÁC AUDIO ĐANG MỞ & CHẠY NỀN", show_header=True, header_style="bold cyan")
+    table.add_column("Mã Phiên (Session ID)", style="bold yellow")
+    table.add_column("PID", style="cyan")
+    table.add_column("Tên Tệp Âm Thanh", style="green")
+    table.add_column("Thời Điểm Bắt Đầu", style="magenta")
+
+    for s in sessions:
+        table.add_row(
+            s.session_id,
+            str(s.pid or "-"),
+            s.filename,
+            s.started_at
+        )
+
+    console.print(table)
+    console.print("[dim]Gợi ý: Dùng lệnh 'python main.py stop' để dừng toàn bộ hoặc 'python main.py stop --session <ID>' để dừng phiên cụ thể.[/dim]")
+
+def handle_stop(args, manage_playback_uc: ManagePlaybackUseCase):
+    if args.session:
+        stopped = manage_playback_uc.stop_playback(session_id=args.session)
+        if stopped:
+            console.print(f"[bold green]✅ Đã dừng phiên audio '{args.session}'.[/bold green]")
+        else:
+            console.print(f"[bold red]❌ Không tìm thấy phiên audio '{args.session}' để dừng.[/bold red]")
+    else:
+        stopped_count = manage_playback_uc.stop_all_playbacks()
+        console.print(f"[bold green]⏹️ Đã dừng toàn bộ ({stopped_count}) phiên audio đang chạy ngầm trên máy.[/bold green]")
+
 def main_entrypoint():
     parser = argparse.ArgumentParser(
         description="Text-to-Speech từ Google Docs & Phát Audio (Clean Architecture)"
@@ -153,6 +189,13 @@ def main_entrypoint():
     voices_parser = subparsers.add_parser("voices", help="Hiển thị danh sách các giọng đọc hỗ trợ")
     voices_parser.add_argument("--locale", type=str, default="vi", help="Mã ngôn ngữ (mặc định: vi)")
 
+    # Command: sessions
+    subparsers.add_parser("sessions", help="Liệt kê các audio đang phát/chạy ngầm trên máy")
+
+    # Command: stop
+    stop_parser = subparsers.add_parser("stop", help="Dừng các audio đang chạy ngầm trên máy")
+    stop_parser.add_argument("--session", type=str, help="Mã phiên audio cần dừng (nếu bỏ trống sẽ dừng tất cả)")
+
     # Command: interactive
     subparsers.add_parser("interactive", help="Chế độ tương tác từng bước thân thiện")
 
@@ -169,11 +212,15 @@ def main_entrypoint():
         run_web_server(host=args.host, port=args.port, open_browser=not args.no_browser)
         return
 
-    read_and_speak_uc, list_voices_uc = create_container()
+    read_and_speak_uc, list_voices_uc, manage_playback_uc = create_container()
 
     if args.command == "read":
         asyncio.run(handle_read(args, read_and_speak_uc))
     elif args.command == "voices":
         asyncio.run(handle_voices(args, list_voices_uc))
+    elif args.command == "sessions":
+        handle_sessions(manage_playback_uc)
+    elif args.command == "stop":
+        handle_stop(args, manage_playback_uc)
     elif args.command == "interactive" or args.command is None:
         asyncio.run(handle_interactive(read_and_speak_uc))

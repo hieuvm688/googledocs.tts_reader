@@ -1193,3 +1193,195 @@ input:checked + .switch-slider:before {
     grid-template-columns: 1fr;
   }
 }
+
+/* Active Background Audio Sessions & Alert Banner */
+.nav-count-badge.pulse-active {
+  background: linear-gradient(135deg, #ef4444, #f43f5e);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { transform: scale(1); box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+  50% { transform: scale(1.1); box-shadow: 0 0 12px rgba(239, 68, 68, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+}
+
+.active-audio-alert-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(244, 63, 94, 0.08));
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  animation: fadeInDown 0.3s ease;
+}
+
+.alert-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.pulsing-speaker {
+  font-size: 1.25rem;
+  animation: pulse-glow 1.2s infinite;
+}
+
+.alert-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-banner-view {
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-banner-view:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-banner-stop-all {
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  background: #e11d48;
+  border: 1px solid #f43f5e;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.35);
+  transition: all var(--transition-fast);
+}
+
+.btn-banner-stop-all:hover {
+  background: #be123c;
+  transform: translateY(-1px);
+}
+
+/* Sessions List & Card */
+.sessions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.session-stats-bar {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 4px 2px;
+}
+
+.session-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  transition: all var(--transition-normal);
+}
+
+.session-card:hover {
+  border-color: var(--border-active);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.session-card-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulse-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulse-green 1.5s infinite;
+}
+
+@keyframes pulse-green {
+  0% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #10b981; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px #10b981; }
+  100% { transform: scale(0.9); opacity: 0.7; box-shadow: 0 0 4px #10b981; }
+}
+
+.session-card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.session-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--text-primary);
+}
+
+.session-pid-badge {
+  font-size: 0.72rem;
+  font-family: monospace;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+}
+
+.session-active-pill {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+  font-weight: 600;
+}
+
+.session-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.session-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-pulse {
+  animation: pulse-btn 1.4s infinite;
+}
+
+@keyframes pulse-btn {
+  0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(244, 63, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+}

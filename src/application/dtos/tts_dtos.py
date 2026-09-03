@@ -32,3 +32,14 @@ class VoiceDto:
     locale: str
     gender: str
     is_default: bool
+
+@dataclass(frozen=True)
+class PlaybackSessionDto:
+    """DTO thông tin phiên phát âm thanh đang chạy."""
+    session_id: str
+    filename: str
+    file_path: str
+    title: str
+    started_at: str
+    is_active: bool
+    pid: Optional[int] = None

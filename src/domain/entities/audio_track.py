@@ -7,7 +7,7 @@ from typing import Optional
 class AudioTrack:
     """Đại diện cho tệp âm thanh được sinh ra sau khi tổng hợp TTS."""
     file_path: Path
-    format: str  # e.g., 'mp3', 'wav'
+    format: str = "mp3"  # e.g., 'mp3', 'wav'
     duration_seconds: Optional[float] = None
     file_size_bytes: int = 0
     is_partial: bool = False

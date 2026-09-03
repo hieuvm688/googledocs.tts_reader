@@ -57,6 +57,16 @@ const I18N = {
     playNow: "▶ Phát ngay",
     words: "từ",
     chars: "ký tự",
+    tabActiveAudio: "Audio Đang Phát",
+    activeAudioTitle: "Quản Lý Audio Đang Mở & Chạy Nền",
+    activeAudioSubtitle: "Giám sát các tiến trình afplay và tắt các audio đang chạy ngầm trên máy",
+    stopAllAudio: "⏹️ Dừng tất cả audio nền",
+    stopThisAudio: "⏹️ Tắt audio này",
+    stopMac: "Dừng loa Mac",
+    noActiveAudio: "Hiện không có audio nào đang chạy dưới nền.",
+    backgroundAudioPlaying: "audio đang phát dưới nền",
+    manageSessions: "Quản lý",
+    refresh: "Làm mới",
   },
   en: {
     appTitle: "Google Docs TTS Studio",
@@ -98,6 +108,16 @@ const I18N = {
     playNow: "▶ Play Now",
     words: "words",
     chars: "characters",
+    tabActiveAudio: "Active Audio",
+    activeAudioTitle: "Active & Background Audio Manager",
+    activeAudioSubtitle: "Monitor and stop background audio playback processes on your Mac",
+    stopAllAudio: "⏹️ Stop All Background Audio",
+    stopThisAudio: "⏹️ Stop Audio",
+    stopMac: "Stop Mac Speaker",
+    noActiveAudio: "No audio is currently playing in the background.",
+    backgroundAudioPlaying: "audio tracks playing in background",
+    manageSessions: "Manage",
+    refresh: "Refresh",
   },
   cn: {
     appTitle: "Google Docs 语音工作台",
@@ -503,6 +523,7 @@ function App() {
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
   const [isMacPlaying, setIsMacPlaying] = useState(false);
+  const [activeSessions, setActiveSessions] = useState([]);
 
   const [libraryFiles, setLibraryFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -530,6 +551,24 @@ function App() {
       })
       .catch((err) => console.warn("Lỗi tải giọng đọc:", err));
   }, []);
+
+  const fetchActiveSessions = useCallback(() => {
+    fetch("/api/playback/sessions")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "success") {
+          setActiveSessions(data.data || []);
+          setIsMacPlaying((data.data || []).length > 0);
+        }
+      })
+      .catch((err) => console.warn("Lỗi tải active sessions:", err));
+  }, []);
+
+  useEffect(() => {
+    fetchActiveSessions();
+    const interval = setInterval(fetchActiveSessions, 2500);
+    return () => clearInterval(interval);
+  }, [fetchActiveSessions]);
 
   const fetchLibrary = useCallback(() => {
     fetch("/api/library")
@@ -724,17 +763,53 @@ function App() {
 
   const handlePlayOnMac = async (filename) => {
     if (!filename) return;
-    setIsMacPlaying(true);
     try {
-      await fetch("/api/play-mac", {
+      const res = await fetch("/api/play-mac", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ filename }),
       });
+      const data = await res.json();
+      if (data.status === "success") {
+        fetchActiveSessions();
+      } else {
+        alert("Không thể phát qua loa Mac: " + (data.message || "Lỗi không xác định"));
+      }
     } catch (err) {
       alert("Không thể phát qua loa Mac: " + err.message);
-    } finally {
-      setTimeout(() => setIsMacPlaying(false), 2000);
+    }
+  };
+
+  const handleStopSession = async (sessionId) => {
+    try {
+      const res = await fetch("/api/playback/stop", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      const data = await res.json();
+      if (data.status === "success") {
+        fetchActiveSessions();
+      } else {
+        alert(data.message || "Không thể dừng phiên audio này.");
+      }
+    } catch (err) {
+      alert("Lỗi khi dừng audio: " + err.message);
+    }
+  };
+
+  const handleStopAllSessions = async () => {
+    try {
+      const res = await fetch("/api/playback/stop-all", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (data.status === "success") {
+        fetchActiveSessions();
+      }
+    } catch (err) {
+      alert("Lỗi khi dừng tất cả: " + err.message);
     }
   };
 
@@ -812,6 +887,21 @@ function App() {
             </div>
             {libraryFiles.length > 0 && <span className="nav-count-badge">{libraryFiles.length}</span>}
           </button>
+          <button
+            className={`sidebar-nav-item ${currentView === "sessions" ? "active" : ""}`}
+            onClick={() => {
+              setCurrentView("sessions");
+              fetchActiveSessions();
+            }}
+          >
+            <div className="sidebar-nav-left">
+              <span>🔊</span>
+              <span>{t.tabActiveAudio || "Audio Đang Phát"}</span>
+            </div>
+            {activeSessions.length > 0 && (
+              <span className="nav-count-badge pulse-active">{activeSessions.length}</span>
+            )}
+          </button>
         </div>
 
         {/* Footer */}
@@ -828,11 +918,19 @@ function App() {
         {/* Top Header Bar */}
         <div className="main-top-bar">
           <div className="top-bar-title">
-            <h1>{currentView === "converter" ? t.appTitle : t.libraryTitle}</h1>
+            <h1>
+              {currentView === "converter"
+                ? t.appTitle
+                : currentView === "library"
+                ? t.libraryTitle
+                : (t.activeAudioTitle || "Quản Lý Audio Đang Mở & Nền")}
+            </h1>
             <p>
               {currentView === "converter"
                 ? t.appSubtitle
-                : `Hệ thống lưu trữ ${libraryFiles.length} bản ghi âm thanh`}
+                : currentView === "library"
+                ? `Hệ thống lưu trữ ${libraryFiles.length} bản ghi âm thanh`
+                : (t.activeAudioSubtitle || "Giám sát các tiến trình phát âm thanh và tắt audio chạy ngầm")}
             </p>
           </div>
 
@@ -862,6 +960,35 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Active Audio Alert Banner */}
+        {activeSessions.length > 0 && (
+          <div className="active-audio-alert-banner">
+            <div className="alert-banner-left">
+              <span className="pulsing-speaker">🔊</span>
+              <span>
+                Có <strong>{activeSessions.length}</strong> {t.backgroundAudioPlaying || "audio đang phát dưới nền máy Mac"}
+              </span>
+            </div>
+            <div className="alert-banner-actions">
+              <button
+                className="btn-banner-view"
+                onClick={() => {
+                  setCurrentView("sessions");
+                  fetchActiveSessions();
+                }}
+              >
+                {t.manageSessions || "Quản lý"}
+              </button>
+              <button
+                className="btn-banner-stop-all"
+                onClick={handleStopAllSessions}
+              >
+                {t.stopAllAudio || "⏹️ Dừng tất cả"}
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* VIEW 1: CONVERTER */}
         {currentView === "converter" && (
@@ -1201,13 +1328,24 @@ function App() {
                   ))}
 
                   <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-                    <button
-                      className="btn-secondary"
-                      onClick={() => handlePlayOnMac(result.audio_filename)}
-                      disabled={isMacPlaying}
-                    >
-                      {isMacPlaying ? t.playingMac : t.playMac}
-                    </button>
+                    {activeSessions.some((s) => s.filename === result.audio_filename) ? (
+                      <button
+                        className="btn-danger btn-pulse"
+                        onClick={() => {
+                          const sess = activeSessions.find((s) => s.filename === result.audio_filename);
+                          if (sess) handleStopSession(sess.session_id);
+                        }}
+                      >
+                        ⏹️ {t.stopMac || "Dừng loa Mac"}
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-secondary"
+                        onClick={() => handlePlayOnMac(result.audio_filename)}
+                      >
+                        {t.playMac}
+                      </button>
+                    )}
                   </div>
                 </div>
               </section>
@@ -1276,15 +1414,121 @@ function App() {
                         <a href={item.audio_url} download={`${item.title}.mp3`} className="btn-secondary">
                           ⬇️ MP3
                         </a>
-                        <button className="btn-secondary" onClick={() => handlePlayOnMac(item.filename)}>
-                          🔊 Mac
-                        </button>
+                        {activeSessions.some((s) => s.filename === item.filename) ? (
+                          <button
+                            className="btn-danger btn-pulse"
+                            onClick={() => {
+                              const sess = activeSessions.find((s) => s.filename === item.filename);
+                              if (sess) handleStopSession(sess.session_id);
+                            }}
+                            title="Dừng phát tệp âm thanh này"
+                          >
+                            ⏹️ Dừng
+                          </button>
+                        ) : (
+                          <button
+                            className="btn-secondary"
+                            onClick={() => handlePlayOnMac(item.filename)}
+                            title="Phát ra loa máy Mac"
+                          >
+                            🔊 Mac
+                          </button>
+                        )}
                         <button className="btn-danger" onClick={() => handleDeleteAudio(item.filename)}>
                           {t.delete}
                         </button>
                       </div>
                     </div>
                   ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* VIEW 3: ACTIVE AUDIO SESSIONS (QUẢN LÝ AUDIO ĐANG MỞ & NỀN) */}
+        {currentView === "sessions" && (
+          <div className="glass-card">
+            <div className="library-header">
+              <div>
+                <h2 style={{ fontSize: "1.35rem", fontWeight: 800 }}>
+                  🔊 {t.activeAudioTitle || "Quản Lý Audio Đang Mở & Chạy Nền"}
+                </h2>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                  {t.activeAudioSubtitle ||
+                    "Giám sát các tiến trình phát âm thanh afplay và dừng các audio đang chạy ngầm trên máy."}
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button
+                  className="btn-secondary"
+                  onClick={fetchActiveSessions}
+                  title={t.refresh || "Làm mới"}
+                >
+                  🔄 {t.refresh || "Làm mới"}
+                </button>
+                {activeSessions.length > 0 && (
+                  <button className="btn-danger" onClick={handleStopAllSessions}>
+                    {t.stopAllAudio || "⏹️ Dừng tất cả audio nền"}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {activeSessions.length === 0 ? (
+              <div className="empty-state">
+                <div style={{ fontSize: 48 }}>🎧</div>
+                <h3 style={{ marginTop: 12, fontSize: "1.1rem" }}>
+                  {t.noActiveAudio || "Hiện không có audio nào đang chạy dưới nền"}
+                </h3>
+                <p
+                  style={{
+                    color: "var(--text-muted)",
+                    fontSize: "0.88rem",
+                    marginTop: 4,
+                  }}
+                >
+                  Tất cả các tiến trình phát âm thanh đều đang yên tĩnh. Bạn có thể
+                  phát audio ra loa máy Mac từ Thư viện hoặc Studio.
+                </p>
+              </div>
+            ) : (
+              <div className="sessions-list">
+                <div className="session-stats-bar">
+                  <span>
+                    Tổng cộng: <strong>{activeSessions.length}</strong> tiến trình
+                    âm thanh đang phát
+                  </span>
+                </div>
+                {activeSessions.map((session) => (
+                  <div key={session.session_id} className="session-card">
+                    <div className="session-card-indicator">
+                      <div className="pulse-dot"></div>
+                    </div>
+                    <div className="session-card-info">
+                      <div className="session-card-title">
+                        <span>{session.title || session.filename}</span>
+                        {session.pid && (
+                          <span className="session-pid-badge">
+                            PID: {session.pid}
+                          </span>
+                        )}
+                        <span className="session-active-pill">🟢 Đang phát</span>
+                      </div>
+                      <div className="session-card-meta">
+                        <span>📁 {session.filename}</span>
+                        <span>⏱️ Bắt đầu: {session.started_at}</span>
+                      </div>
+                    </div>
+                    <div className="session-card-actions">
+                      <button
+                        className="btn-danger"
+                        onClick={() => handleStopSession(session.session_id)}
+                      >
+                        {t.stopThisAudio || "⏹️ Tắt audio này"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
