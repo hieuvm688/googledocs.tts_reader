@@ -27,3 +27,9 @@ Tài liệu này định nghĩa các quy tắc kỹ thuật nghiêm ngặt áp d
 ## 4. Kiểm Thử (Testing Rule)
 - Mỗi Use Case phải có ít nhất 1 Unit Test tương ứng.
 - Không được gọi network thật trong Unit Test (dùng Mock hoặc Stub cho các Ports).
+
+## 5. Quy Tắc Cập Nhật Tài Liệu (Documentation Rule)
+- **BẮT BUỘC ĐỒNG BỘ**: Khi có bất kỳ tính năng mới nào được thêm vào, hoặc khi sửa/thay đổi logic của bất kỳ module nào, nhà phát triển/AI Agent **BẮT BUỘC PHẢI CẬP NHẬT ĐỒNG BỘ** vào:
+  1. `README.md`: Hướng dẫn sử dụng tổng quan, các lệnh chạy nhanh, và danh sách tính năng mới.
+  2. Thư mục `docs/` (đặc biệt là `docs/user_guide.md`): Hướng dẫn chi tiết từng bước, ảnh chụp hoặc mô tả giao diện, cách vận hành các tham số/tính năng mới.
+- Tuyệt đối không để xảy ra tình trạng code đã thay đổi nhưng tài liệu hướng dẫn vẫn là phiên bản cũ.

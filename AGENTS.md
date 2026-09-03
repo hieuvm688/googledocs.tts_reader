@@ -58,6 +58,8 @@ Khi có yêu cầu phát triển tính năng mới, Agent phải thực hiện t
 5. **Bước 5: Ghép Nối (DI) & Viết Test**
    - Đăng ký Adapter vào `main.py` hoặc CLI.
    - Viết Unit Test kiểm thử Use Case bằng Mock Adapter.
+6. **Bước 6: Bắt Buộc Cập Nhật Tài Liệu (Documentation Sync)**
+   - **CẤM BỎ QUA**: Mỗi khi phát triển tính năng mới hoặc sửa/thay đổi bất kỳ module nào, AI Agent **BẮT BUỘC PHẢI CẬP NHẬT ĐỒNG BỘ** vào `README.md` và thư mục `docs/` (`docs/user_guide.md`). Tuyệt đối không được kết thúc nhiệm vụ khi tài liệu chưa phản ánh mã nguồn thực tế.
 
 ---
 
@@ -70,3 +72,5 @@ Khi có yêu cầu phát triển tính năng mới, Agent phải thực hiện t
    - 100% hàm và phương thức phải có **Type Hints** (`typing`).
    - Mọi class và method phải có docstrings tiếng Việt hoặc tiếng Anh chuẩn.
    - Xử lý bất đồng bộ (`asyncio`) chuẩn xác khi làm việc với `edge-tts`.
+3. **Đồng bộ tài liệu kỹ thuật**:
+   - Mọi thay đổi về API, kiến trúc, giao diện hay cờ dòng lệnh phải được ghi chú đầy đủ vào `README.md` và `docs/user_guide.md`.

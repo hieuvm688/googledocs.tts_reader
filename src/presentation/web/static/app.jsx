@@ -18,13 +18,15 @@ const LANGUAGES = {
 // Từ điển bản địa hóa (i18n) cho 11 ngôn ngữ
 const I18N = {
   vi: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Chuyển đổi văn bản & tài liệu thành giọng đọc AI tự nhiên",
-    tabConverter: "🎙️ Chuyển Đổi TTS",
-    tabLibrary: "📁 Quản Lý Audio",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Tải Tệp (.docx, .txt)",
-    tabText: "✍️ Nhập Văn Bản",
+    workspaceTitle: "KHÔNG GIAN LÀM VIỆC",
+    systemTitle: "HỆ THỐNG & CÀI ĐẶT",
+    tabConverter: "Studio Chuyển Đổi",
+    tabLibrary: "Thư Viện Audio",
+    tabGdocs: "Google Docs",
+    tabFile: "Tải Tệp (.docx, .txt)",
+    tabText: "Nhập Văn Bản",
     gdocsLabel: "Đường dẫn liên kết Google Docs",
     gdocsHint: 'Yêu cầu quyền "Bất kỳ ai có đường liên kết đều có thể xem"',
     paste: "📋 Dán",
@@ -47,7 +49,7 @@ const I18N = {
     playingMac: "🔊 Đang phát loa Mac...",
     partialBadge: "⏹️ Bản thu một phần (Đã dừng)",
     completed: "Hoàn tất",
-    libraryTitle: "Thư viện các bản audio đã chuyển đổi",
+    libraryTitle: "Thư Viện Các Bản Audio",
     searchPlaceholder: "Tìm kiếm bản thu theo tên...",
     emptyLibrary: "Chưa có bản thu nào trong thư viện.",
     delete: "🗑️ Xóa",
@@ -57,13 +59,15 @@ const I18N = {
     chars: "ký tự",
   },
   en: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Convert documents & text to natural AI speech",
-    tabConverter: "🎙️ TTS Converter",
-    tabLibrary: "📁 Audio Library",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Upload File (.docx, .txt)",
-    tabText: "✍️ Direct Text",
+    workspaceTitle: "WORKSPACE",
+    systemTitle: "SYSTEM & SETTINGS",
+    tabConverter: "TTS Studio",
+    tabLibrary: "Audio Library",
+    tabGdocs: "Google Docs",
+    tabFile: "Upload File (.docx, .txt)",
+    tabText: "Direct Text",
     gdocsLabel: "Google Docs document link",
     gdocsHint: 'Requires "Anyone with the link can view" permission',
     paste: "📋 Paste",
@@ -86,7 +90,7 @@ const I18N = {
     playingMac: "🔊 Playing on Mac...",
     partialBadge: "⏹️ Partial Audio (Stopped)",
     completed: "Completed",
-    libraryTitle: "Audio Library & Converted Files",
+    libraryTitle: "Audio Library & Archive",
     searchPlaceholder: "Search audio recordings...",
     emptyLibrary: "No audio recordings found in library.",
     delete: "🗑️ Delete",
@@ -96,13 +100,15 @@ const I18N = {
     chars: "characters",
   },
   cn: {
-    appTitle: "Google Docs 语音合成阅读器",
+    appTitle: "Google Docs 语音工作台",
     appSubtitle: "将文档和文本转换为自然流畅的 AI 语音",
-    tabConverter: "🎙️ 语音转换",
-    tabLibrary: "📁 音频管理",
-    tabGdocs: "🔗 Google 文档",
-    tabFile: "📁 上传文件 (.docx, .txt)",
-    tabText: "✍️ 直接输入",
+    workspaceTitle: "工作空间",
+    systemTitle: "系统与设置",
+    tabConverter: "语音工作室",
+    tabLibrary: "音频媒体库",
+    tabGdocs: "Google 文档",
+    tabFile: "上传文件 (.docx, .txt)",
+    tabText: "直接输入",
     gdocsLabel: "Google Docs 链接",
     gdocsHint: "需要开启「任何知道链接的人均可查看」权限",
     paste: "📋 粘贴",
@@ -135,13 +141,15 @@ const I18N = {
     chars: "字",
   },
   es: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Convierte documentos y texto en voz natural de IA",
-    tabConverter: "🎙️ Conversor TTS",
-    tabLibrary: "📁 Biblioteca de Audio",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Subir Archivo (.docx, .txt)",
-    tabText: "✍️ Texto Directo",
+    workspaceTitle: "ESPACIO DE TRABAJO",
+    systemTitle: "SISTEMA Y AJUSTES",
+    tabConverter: "Estudio TTS",
+    tabLibrary: "Biblioteca de Audio",
+    tabGdocs: "Google Docs",
+    tabFile: "Subir Archivo (.docx, .txt)",
+    tabText: "Texto Directo",
     gdocsLabel: "Enlace de Google Docs",
     gdocsHint: 'Requiere permiso "Cualquiera con el enlace puede ver"',
     paste: "📋 Pegar",
@@ -174,13 +182,15 @@ const I18N = {
     chars: "caracteres",
   },
   fr: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Convertissez vos documents et textes en voix IA naturelle",
-    tabConverter: "🎙️ Convertisseur TTS",
-    tabLibrary: "📁 Bibliothèque Audio",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Fichier (.docx, .txt)",
-    tabText: "✍️ Texte Direct",
+    workspaceTitle: "ESPACE DE TRAVAIL",
+    systemTitle: "SYSTÈME ET PARAMÈTRES",
+    tabConverter: "Studio TTS",
+    tabLibrary: "Bibliothèque Audio",
+    tabGdocs: "Google Docs",
+    tabFile: "Fichier (.docx, .txt)",
+    tabText: "Texte Direct",
     gdocsLabel: "Lien Google Docs",
     gdocsHint: 'Nécessite l\'accès "Tous les utilisateurs disposant du lien"',
     paste: "📋 Coller",
@@ -213,13 +223,15 @@ const I18N = {
     chars: "caractères",
   },
   jp: {
-    appTitle: "Google Docs 音声リーダー",
+    appTitle: "Google Docs 音声スタジオ",
     appSubtitle: "文書やテキストを自然な AI 音声に変換",
-    tabConverter: "🎙️ 音声変換",
-    tabLibrary: "📁 音声ライブラリ",
-    tabGdocs: "🔗 Google ドキュメント",
-    tabFile: "📁 ファイル (.docx, .txt)",
-    tabText: "✍️ テキスト直接入力",
+    workspaceTitle: "ワークスペース",
+    systemTitle: "システム設定",
+    tabConverter: "音声スタジオ",
+    tabLibrary: "音声ライブラリ",
+    tabGdocs: "Google ドキュメント",
+    tabFile: "ファイル (.docx, .txt)",
+    tabText: "テキスト直接入力",
     gdocsLabel: "Google ドキュメントのリンク",
     gdocsHint: "「リンクを知っている全員が閲覧可能」設定が必要です",
     paste: "📋 貼り付け",
@@ -252,13 +264,15 @@ const I18N = {
     chars: "文字",
   },
   ru: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Преобразование текста и документов в живой голос ИИ",
-    tabConverter: "🎙️ Преобразование",
-    tabLibrary: "📁 Аудиотека",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Файл (.docx, .txt)",
-    tabText: "✍️ Ввод Текста",
+    workspaceTitle: "РАБОЧАЯ ОБЛАСТЬ",
+    systemTitle: "СИСТЕМА И НАСТРОЙКИ",
+    tabConverter: "TTS Студия",
+    tabLibrary: "Аудиотека",
+    tabGdocs: "Google Docs",
+    tabFile: "Файл (.docx, .txt)",
+    tabText: "Ввод Текста",
     gdocsLabel: "Ссылка на Google Docs",
     gdocsHint: 'Требуется доступ "Все, у кого есть ссылка, могут просматривать"',
     paste: "📋 Вставить",
@@ -291,13 +305,15 @@ const I18N = {
     chars: "символов",
   },
   ar: {
-    appTitle: "قارئ مستندات Google الصوتي",
+    appTitle: "استوديو مستندات Google الصوتي",
     appSubtitle: "تحويل المستندات والنصوص إلى أصوات ذكاء اصطناعي طبيعية",
-    tabConverter: "🎙️ محول الصوت",
-    tabLibrary: "📁 مكتبة الصوتيات",
-    tabGdocs: "🔗 مستندات Google",
-    tabFile: "📁 رفع ملف (.docx, .txt)",
-    tabText: "✍️ إدخال نص",
+    workspaceTitle: "مساحة العمل",
+    systemTitle: "النظام والإعدادات",
+    tabConverter: "استوديو الصوت",
+    tabLibrary: "مكتبة الصوتيات",
+    tabGdocs: "مستندات Google",
+    tabFile: "رفع ملف (.docx, .txt)",
+    tabText: "إدخال نص",
     gdocsLabel: "رابط مستند Google",
     gdocsHint: 'يتطلب إذن "أي شخص لديه الرابط يمكنه العرض"',
     paste: "📋 لصق",
@@ -330,13 +346,15 @@ const I18N = {
     chars: "حرف",
   },
   hi: {
-    appTitle: "Google Docs टीटीएस रीडर",
+    appTitle: "Google Docs टीटीएस स्टूडियो",
     appSubtitle: "दस्तावेज़ों और टेक्स्ट को स्वाभाविक AI आवाज़ में बदलें",
-    tabConverter: "🎙️ टीटीएस कनवर्टर",
-    tabLibrary: "📁 ऑडियो लाइब्रेरी",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 फ़ाइल (.docx, .txt)",
-    tabText: "✍️ सीधा टेक्स्ट",
+    workspaceTitle: "कार्यक्षेत्र",
+    systemTitle: "सिस्टम और सेटिंग्स",
+    tabConverter: "टीटीएस स्टूडियो",
+    tabLibrary: "ऑडियो लाइब्रेरी",
+    tabGdocs: "Google Docs",
+    tabFile: "फ़ाइल (.docx, .txt)",
+    tabText: "सीधा टेक्स्ट",
     gdocsLabel: "Google Docs दस्तावेज़ लिंक",
     gdocsHint: '"लिंक वाला कोई भी व्यक्ति देख सकता है" अनुमति आवश्यक है',
     paste: "📋 पेस्ट",
@@ -369,13 +387,15 @@ const I18N = {
     chars: "अक्षर",
   },
   de: {
-    appTitle: "Google Docs TTS Reader",
+    appTitle: "Google Docs TTS Studio",
     appSubtitle: "Dokumente und Texte in natürliche KI-Stimme umwandeln",
-    tabConverter: "🎙️ TTS-Konverter",
-    tabLibrary: "📁 Audio-Bibliothek",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 Datei (.docx, .txt)",
-    tabText: "✍️ Direkter Text",
+    workspaceTitle: "ARBEITSBEREICH",
+    systemTitle: "SYSTEM & EINSTELLUNGEN",
+    tabConverter: "TTS Studio",
+    tabLibrary: "Audio-Bibliothek",
+    tabGdocs: "Google Docs",
+    tabFile: "Datei (.docx, .txt)",
+    tabText: "Direkter Text",
     gdocsLabel: "Google Docs Dokument-Link",
     gdocsHint: 'Benötigt "Jeder mit dem Link kann ansehen" Berechtigung',
     paste: "📋 Einfügen",
@@ -398,7 +418,7 @@ const I18N = {
     playingMac: "🔊 Wiedergabe auf Mac...",
     partialBadge: "⏹️ Teilaufnahme (Gestoppt)",
     completed: "Abgeschlossen",
-    libraryTitle: "Bibliothek der Konvertierten Audiodateien",
+    libraryTitle: "Bibliothek der Audiodateien",
     searchPlaceholder: "Audioaufnahmen durchsuchen...",
     emptyLibrary: "Keine Audiodateien in der Bibliothek.",
     delete: "🗑️ Löschen",
@@ -408,13 +428,15 @@ const I18N = {
     chars: "Zeichen",
   },
   ko: {
-    appTitle: "Google Docs TTS 리더",
+    appTitle: "Google Docs TTS 스튜디오",
     appSubtitle: "문서 및 텍스트를 자연스러운 AI 음성으로 변환",
-    tabConverter: "🎙️ TTS 변환기",
-    tabLibrary: "📁 오디오 보관함",
-    tabGdocs: "🔗 Google Docs",
-    tabFile: "📁 파일 (.docx, .txt)",
-    tabText: "✍️ 직접 입력",
+    workspaceTitle: "작업 공간",
+    systemTitle: "시스템 및 설정",
+    tabConverter: "TTS 스튜디오",
+    tabLibrary: "오디오 보관함",
+    tabGdocs: "Google Docs",
+    tabFile: "파일 (.docx, .txt)",
+    tabText: "직접 입력",
     gdocsLabel: "Google Docs 문서 링크",
     gdocsHint: '"링크가 있는 모든 사용자가 볼 수 있음" 권한 필요',
     paste: "📋 붙여넣기",
@@ -449,28 +471,23 @@ const I18N = {
 };
 
 function App() {
-  // Theme & Language state
   const [theme, setTheme] = useState(() => localStorage.getItem("gdocs_tts_theme") || "dark");
   const [lang, setLang] = useState(() => localStorage.getItem("gdocs_tts_lang") || "vi");
   const t = I18N[lang] || I18N.vi;
 
-  // Navigation View: 'converter' | 'library'
-  const [currentView, setCurrentView] = useState("converter");
+  const [currentView, setCurrentView] = useState("converter"); // 'converter' | 'library'
+  const [activeTab, setActiveTab] = useState("gdocs"); // 'gdocs' | 'file' | 'text'
 
-  // Input tab: 'gdocs' | 'file' | 'text'
-  const [activeTab, setActiveTab] = useState("gdocs");
   const [url, setUrl] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [rawText, setRawText] = useState("");
 
-  // Settings state
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("vi-VN-HoaiMyNeural");
-  const [rateSlider, setRateSlider] = useState(0); // -50% to +100%
+  const [rateSlider, setRateSlider] = useState(0);
   const [playMac, setPlayMac] = useState(false);
 
-  // Execution & Job state
   const [currentJobId, setCurrentJobId] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
@@ -478,7 +495,6 @@ function App() {
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
 
-  // Audio Player state
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -488,17 +504,14 @@ function App() {
   const [isMuted, setIsMuted] = useState(false);
   const [isMacPlaying, setIsMacPlaying] = useState(false);
 
-  // Library state
   const [libraryFiles, setLibraryFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Apply Theme
   useEffect(() => {
     document.body.className = theme === "dark" ? "theme-dark" : "theme-light";
     localStorage.setItem("gdocs_tts_theme", theme);
   }, [theme]);
 
-  // Apply Language & Auto-suggest top voice for that language
   useEffect(() => {
     localStorage.setItem("gdocs_tts_lang", lang);
     const langConfig = LANGUAGES[lang];
@@ -507,7 +520,6 @@ function App() {
     }
   }, [lang]);
 
-  // Load Voices from API
   useEffect(() => {
     fetch("/api/voices")
       .then((res) => res.json())
@@ -519,7 +531,6 @@ function App() {
       .catch((err) => console.warn("Lỗi tải giọng đọc:", err));
   }, []);
 
-  // Fetch Library Files
   const fetchLibrary = useCallback(() => {
     fetch("/api/library")
       .then((res) => res.json())
@@ -535,7 +546,6 @@ function App() {
     fetchLibrary();
   }, [fetchLibrary]);
 
-  // Time formatter
   const formatTime = (secs) => {
     if (isNaN(secs) || secs < 0) return "00:00";
     const m = Math.floor(secs / 60);
@@ -557,7 +567,6 @@ function App() {
     }
   };
 
-  // Drag & Drop
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -571,7 +580,6 @@ function App() {
     }
   };
 
-  // Start Conversion
   const handleStartRead = async (e) => {
     if (e) e.preventDefault();
     setError(null);
@@ -632,7 +640,6 @@ function App() {
       setResult(resData.data);
       fetchLibrary();
 
-      // Autoplay if not Mac speakers
       if (!playMac) {
         setTimeout(() => {
           if (audioRef.current) {
@@ -648,7 +655,6 @@ function App() {
     }
   };
 
-  // Stop Processing Handler
   const handleStopProcessing = async () => {
     if (!currentJobId) return;
     setIsStopping(true);
@@ -672,7 +678,6 @@ function App() {
     }
   };
 
-  // Audio Player Handlers
   const togglePlay = () => {
     if (!audioRef.current) return;
     if (isPlaying) {
@@ -764,491 +769,529 @@ function App() {
     }, 250);
   };
 
-  // Filter voices for current language
   const filteredVoices = voices.filter((v) => {
     const targetPrefix = lang === "cn" ? "zh" : lang === "jp" ? "ja" : lang;
     return v.locale.toLowerCase().startsWith(targetPrefix.toLowerCase());
   });
 
   return (
-    <div className="app-container">
-      {/* Top Navbar */}
-      <nav className="app-navbar">
-        <div className="nav-brand">
-          <div className="nav-brand-icon">🎙️</div>
-          <div>
-            <div className="nav-brand-title">{t.appTitle}</div>
+    <div className="enterprise-layout">
+      {/* LEFT SIDEBAR */}
+      <aside className="app-sidebar">
+        {/* Brand */}
+        <div className="sidebar-brand">
+          <div className="sidebar-logo">🎙️</div>
+          <div className="sidebar-title-box">
+            <span className="sidebar-title">GDocs Studio</span>
+            <span className="sidebar-badge">Enterprise v2.2</span>
           </div>
         </div>
 
-        <div className="nav-menu">
+        {/* Navigation Workspace */}
+        <div className="sidebar-section-title">{t.workspaceTitle}</div>
+        <div className="sidebar-nav-list">
           <button
-            className={`nav-tab-btn ${currentView === "converter" ? "active" : ""}`}
+            className={`sidebar-nav-item ${currentView === "converter" ? "active" : ""}`}
             onClick={() => setCurrentView("converter")}
           >
-            {t.tabConverter}
+            <div className="sidebar-nav-left">
+              <span>🎙️</span>
+              <span>{t.tabConverter}</span>
+            </div>
           </button>
           <button
-            className={`nav-tab-btn ${currentView === "library" ? "active" : ""}`}
+            className={`sidebar-nav-item ${currentView === "library" ? "active" : ""}`}
             onClick={() => {
               setCurrentView("library");
               fetchLibrary();
             }}
           >
-            {t.tabLibrary}
-            {libraryFiles.length > 0 && <span className="count-badge">{libraryFiles.length}</span>}
+            <div className="sidebar-nav-left">
+              <span>📁</span>
+              <span>{t.tabLibrary}</span>
+            </div>
+            {libraryFiles.length > 0 && <span className="nav-count-badge">{libraryFiles.length}</span>}
           </button>
         </div>
 
-        <div className="nav-controls">
-          {/* Multi-language Selector (11 Languages) */}
-          <select
-            className="lang-select"
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            title="Đổi ngôn ngữ giao diện (Multilanguage)"
-          >
-            {Object.entries(LANGUAGES).map(([code, item]) => (
-              <option key={code} value={code}>
-                {item.flag} {item.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Theme Toggle */}
-          <button
-            className="theme-toggle-btn"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            title="Theme Sáng / Tối"
-          >
-            {theme === "dark" ? "☀️" : "🌙"}
-          </button>
-        </div>
-      </nav>
-
-      {/* VIEW 1: CONVERTER */}
-      {currentView === "converter" && (
-        <>
-          <main className="glass-card">
-            {/* Input Mode Tabs */}
-            <div className="tabs-header">
-              <button
-                className={`tab-btn ${activeTab === "gdocs" ? "active" : ""}`}
-                onClick={() => setActiveTab("gdocs")}
-              >
-                {t.tabGdocs}
-              </button>
-              <button
-                className={`tab-btn ${activeTab === "file" ? "active" : ""}`}
-                onClick={() => setActiveTab("file")}
-              >
-                {t.tabFile}
-              </button>
-              <button
-                className={`tab-btn ${activeTab === "text" ? "active" : ""}`}
-                onClick={() => setActiveTab("text")}
-              >
-                {t.tabText}
-              </button>
-            </div>
-
-            {/* Tab: Google Docs */}
-            {activeTab === "gdocs" && (
-              <div className="form-group">
-                <div className="form-label">
-                  <span>{t.gdocsLabel}</span>
-                  <span className="input-hint">{t.gdocsHint}</span>
-                </div>
-                <div className="input-with-actions">
-                  <input
-                    type="text"
-                    className="text-input"
-                    placeholder="https://docs.google.com/document/d/..."
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                  />
-                  <button className="btn-secondary" type="button" onClick={handlePasteUrl}>
-                    {t.paste}
-                  </button>
-                  <button
-                    className="btn-secondary"
-                    type="button"
-                    onClick={() =>
-                      setUrl("https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit")
-                    }
-                  >
-                    {t.sample}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Tab: File Upload */}
-            {activeTab === "file" && (
-              <div className="form-group">
-                <div
-                  className={`dropzone ${isDragging ? "dragover" : ""}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                  onClick={() => document.getElementById("file-input-field").click()}
-                >
-                  <input
-                    id="file-input-field"
-                    type="file"
-                    accept=".docx,.txt"
-                    style={{ display: "none" }}
-                    onChange={(e) => {
-                      if (e.target.files && e.target.files.length > 0) {
-                        setSelectedFile(e.target.files[0]);
-                      }
-                    }}
-                  />
-                  <div style={{ fontSize: 42 }}>📥</div>
-                  <div style={{ fontWeight: 700 }}>{t.dropzoneTitle}</div>
-                  <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{t.dropzoneSubtitle}</div>
-                </div>
-
-                {selectedFile && (
-                  <div className="file-selected-badge">
-                    <span>
-                      📄 <strong>{selectedFile.name}</strong> ({(selectedFile.size / 1024).toFixed(1)} KB)
-                    </span>
-                    <button
-                      className="btn-secondary"
-                      style={{ padding: "4px 8px", fontSize: "0.75rem" }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedFile(null);
-                      }}
-                    >
-                      {t.remove}
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Tab: Direct Text */}
-            {activeTab === "text" && (
-              <div className="form-group">
-                <div className="form-label">
-                  <span>{t.textLabel}</span>
-                  <span className="input-hint">
-                    {rawText.length} {t.chars} (~{rawText.trim() ? rawText.trim().split(/\s+/).length : 0} {t.words})
-                  </span>
-                </div>
-                <textarea
-                  className="textarea-input"
-                  placeholder={t.textPlaceholder}
-                  value={rawText}
-                  onChange={(e) => setRawText(e.target.value)}
-                />
-              </div>
-            )}
-
-            {/* Settings Grid */}
-            <div className="settings-grid">
-              {/* Voice Selector */}
-              <div className="form-group">
-                <label className="form-label" htmlFor="select-voice">
-                  <span>{t.voiceLabel}</span>
-                </label>
-                <select
-                  id="select-voice"
-                  className="select-input"
-                  value={selectedVoice}
-                  onChange={(e) => setSelectedVoice(e.target.value)}
-                >
-                  {filteredVoices.length > 0 ? (
-                    <optgroup label={LANGUAGES[lang]?.name || "Giọng phù hợp"}>
-                      {filteredVoices.map((v) => (
-                        <option key={v.voice_id} value={v.voice_id}>
-                          {v.gender === "Female" ? "👩" : "👨"} {v.name} ({v.locale})
-                        </option>
-                      ))}
-                    </optgroup>
-                  ) : null}
-                  <optgroup label="Tất cả các giọng khác">
-                    {voices
-                      .filter((v) => !filteredVoices.some((fv) => fv.voice_id === v.voice_id))
-                      .slice(0, 40)
-                      .map((v) => (
-                        <option key={v.voice_id} value={v.voice_id}>
-                          {v.locale} - {v.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </select>
-              </div>
-
-              {/* Speech Rate Slider */}
-              <div className="form-group slider-container">
-                <div className="form-label">
-                  <span>{t.speedLabel}</span>
-                  <span style={{ fontWeight: 700, color: "var(--primary)" }}>{getRateString()}</span>
-                </div>
-                <input
-                  type="range"
-                  className="range-slider"
-                  min="-50"
-                  max="100"
-                  step="5"
-                  value={rateSlider}
-                  onChange={(e) => setRateSlider(parseInt(e.target.value, 10))}
-                />
-                <div className="preset-chips">
-                  <button className={`preset-chip ${rateSlider === -20 ? "active" : ""}`} onClick={() => setRateSlider(-20)}>0.8x</button>
-                  <button className={`preset-chip ${rateSlider === 0 ? "active" : ""}`} onClick={() => setRateSlider(0)}>1.0x</button>
-                  <button className={`preset-chip ${rateSlider === 20 ? "active" : ""}`} onClick={() => setRateSlider(20)}>1.2x</button>
-                  <button className={`preset-chip ${rateSlider === 50 ? "active" : ""}`} onClick={() => setRateSlider(50)}>1.5x</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Mac Speakers Toggle */}
-            <div className="toggle-row">
-              <div>
-                <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>{t.macToggle}</div>
-                <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{t.macToggleSub}</div>
-              </div>
-              <label className="switch">
-                <input type="checkbox" checked={playMac} onChange={(e) => setPlayMac(e.target.checked)} />
-                <span className="switch-slider"></span>
-              </label>
-            </div>
-
-            {/* Action Buttons */}
-            {!isLoading ? (
-              <button className="btn-primary-action" type="button" onClick={handleStartRead}>
-                <span>{t.startBtn}</span>
-              </button>
-            ) : (
-              /* Processing State with Stop Button */
-              <div className="processing-card">
-                <div className="processing-info">
-                  <div className="loader-spinner" style={{ width: 26, height: 26 }}></div>
-                  <div>
-                    <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{t.processing}</div>
-                    <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>{statusMessage}</div>
-                  </div>
-                </div>
-                <button
-                  className="btn-stop-action"
-                  type="button"
-                  disabled={isStopping}
-                  onClick={handleStopProcessing}
-                >
-                  {isStopping ? t.stopping : t.stopBtn}
-                </button>
-              </div>
-            )}
-
-            {/* Error Notification */}
-            {error && (
-              <div className="error-banner">
-                <div style={{ fontSize: 20 }}>⚠️</div>
-                <div>
-                  <div style={{ fontWeight: 700 }}>{error.message}</div>
-                </div>
-              </div>
-            )}
-          </main>
-
-          {/* AUDIO PLAYER & RESULTS CARD */}
-          {result && (
-            <section className="player-card">
-              <div className="doc-info-header">
-                <div>
-                  <div className="doc-title">📖 {result.document_title || "Bản thu âm thanh"}</div>
-                  <div className="doc-stats">
-                    {result.is_partial && <span className="partial-badge">{t.partialBadge}</span>}
-                    {result.word_count ? (
-                      <span className="stat-item">
-                        📝 {result.word_count.toLocaleString()} {t.words}
-                      </span>
-                    ) : null}
-                    {result.voice_used && (
-                      <span className="stat-item">🗣️ {result.voice_used.split("-").slice(-1)[0]}</span>
-                    )}
-                  </div>
-                </div>
-
-                <a
-                  href={result.audio_url}
-                  download={`${result.is_partial ? "[Một phần] - " : ""}${result.document_title || "speech"}.mp3`}
-                  className="btn-download-mp3"
-                >
-                  {t.downloadMp3}
-                </a>
-              </div>
-
-              {/* Hidden HTML5 Audio Element */}
-              <audio
-                ref={audioRef}
-                src={result.audio_url}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
-                onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)}
-                onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
-              />
-
-              {/* Waveform Visualizer */}
-              <div className={`wave-visualizer ${isPlaying ? "playing" : ""}`}>
-                {Array.from({ length: 42 }).map((_, idx) => (
-                  <div key={idx} className="wave-bar"></div>
-                ))}
-              </div>
-
-              {/* Complete Audio Player Controls */}
-              <div className="audio-controls-row">
-                <button className="skip-btn" onClick={() => handleSkip(-10)} title="Tua lùi 10 giây">
-                  -10s
-                </button>
-                <button className="skip-btn" onClick={() => handleSkip(-5)} title="Tua lùi 5 giây">
-                  -5s
-                </button>
-
-                <button className="play-pause-btn" onClick={togglePlay} title={isPlaying ? "Tạm dừng" : "Phát"}>
-                  {isPlaying ? "⏸" : "▶"}
-                </button>
-
-                <button className="skip-btn" onClick={() => handleSkip(5)} title="Tua tiến 5 giây">
-                  +5s
-                </button>
-                <button className="skip-btn" onClick={() => handleSkip(10)} title="Tua tiến 10 giây">
-                  +10s
-                </button>
-
-                {/* Scrubber Progress Bar */}
-                <div className="progress-section">
-                  <input
-                    type="range"
-                    className="audio-progress-bar"
-                    min="0"
-                    max={duration || 100}
-                    step="0.1"
-                    value={currentTime}
-                    onChange={handleSeek}
-                  />
-                  <div className="time-display">
-                    <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration)}</span>
-                  </div>
-                </div>
-
-                {/* Volume & Mute */}
-                <div className="volume-control-box">
-                  <button className="mute-btn" onClick={toggleMute} title="Bật/Tắt tiếng">
-                    {isMuted || volume === 0 ? "🔇" : "🔊"}
-                  </button>
-                  <input
-                    type="range"
-                    className="volume-slider"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
-                  />
-                </div>
-              </div>
-
-              {/* Player Aux Actions */}
-              <div className="player-aux-actions">
-                <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>Tốc độ phát:</span>
-                {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
-                  <button
-                    key={spd}
-                    className={`preset-chip ${playerSpeed === spd ? "active" : ""}`}
-                    onClick={() => changeSpeed(spd)}
-                  >
-                    {spd}x
-                  </button>
-                ))}
-
-                <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-                  <button
-                    className="btn-secondary"
-                    onClick={() => handlePlayOnMac(result.audio_filename)}
-                    disabled={isMacPlaying}
-                  >
-                    {isMacPlaying ? t.playingMac : t.playMac}
-                  </button>
-                </div>
-              </div>
-            </section>
-          )}
-        </>
-      )}
-
-      {/* VIEW 2: AUDIO LIBRARY */}
-      {currentView === "library" && (
-        <section className="glass-card">
-          <div className="library-header">
-            <div>
-              <h2 style={{ fontSize: "1.3rem", fontWeight: 800 }}>{t.libraryTitle}</h2>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                Tổng cộng {libraryFiles.length} bản ghi âm thanh đã được lưu trên máy
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <input
-                type="text"
-                className="library-search-input"
-                placeholder={t.searchPlaceholder}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button className="btn-secondary" onClick={fetchLibrary} title="Làm mới">
-                🔄
-              </button>
-            </div>
+        {/* Footer & Controls */}
+        <div className="sidebar-footer">
+          <div className="sidebar-section-title">{t.systemTitle}</div>
+          <div className="sidebar-control-row">
+            <select
+              className="sidebar-lang-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              title="Đa ngôn ngữ (11 Locales)"
+            >
+              {Object.entries(LANGUAGES).map(([code, item]) => (
+                <option key={code} value={code}>
+                  {item.flag} {item.name}
+                </option>
+              ))}
+            </select>
+            <button
+              className="sidebar-theme-btn"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title="Theme Sáng / Tối"
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
           </div>
 
-          {libraryFiles.length === 0 ? (
-            <div className="empty-state">
-              <div style={{ fontSize: 44 }}>📭</div>
-              <p>{t.emptyLibrary}</p>
-            </div>
-          ) : (
-            <div className="library-cards-list">
-              {libraryFiles
-                .filter((item) => item.title.toLowerCase().includes(searchQuery.toLowerCase()) || item.filename.toLowerCase().includes(searchQuery.toLowerCase()))
-                .map((item) => (
-                  <div key={item.filename} className="library-card">
-                    <div className="library-item-info">
-                      <div className="library-item-title">
-                        {item.title}
-                        {item.is_partial && <span className="partial-badge" style={{ marginLeft: 8 }}>{t.partialBadge}</span>}
-                      </div>
-                      <div className="library-item-meta">
-                        <span>📅 {item.created_at}</span>
-                        <span>💾 {item.size_formatted}</span>
-                      </div>
-                    </div>
+          <div className="system-status-box">
+            <div className="status-dot-pulse"></div>
+            <span>Cloud Neural Engine: Online</span>
+          </div>
+        </div>
+      </aside>
 
-                    <div className="library-item-actions">
-                      <button className="btn-secondary" onClick={() => handlePlayLibraryItem(item)}>
-                        {t.playNow}
+      {/* RIGHT MAIN CONTENT AREA */}
+      <main className="main-content-area">
+        {/* Top Header Bar */}
+        <div className="main-top-bar">
+          <div className="top-bar-title">
+            <h1>{currentView === "converter" ? t.appTitle : t.libraryTitle}</h1>
+            <p>
+              {currentView === "converter"
+                ? t.appSubtitle
+                : `Hệ thống lưu trữ ${libraryFiles.length} bản ghi âm thanh`}
+            </p>
+          </div>
+          <div className="top-bar-tags">
+            <span className="tag-badge">⚡ Parallel TTS 3x</span>
+            <span className="tag-badge">🌐 11 Locales</span>
+            <span className="tag-badge">🔒 100% Private</span>
+          </div>
+        </div>
+
+        {/* VIEW 1: CONVERTER */}
+        {currentView === "converter" && (
+          <>
+            <div className="glass-card">
+              {/* Input Tabs */}
+              <div className="tabs-header">
+                <button
+                  className={`tab-btn ${activeTab === "gdocs" ? "active" : ""}`}
+                  onClick={() => setActiveTab("gdocs")}
+                >
+                  {t.tabGdocs}
+                </button>
+                <button
+                  className={`tab-btn ${activeTab === "file" ? "active" : ""}`}
+                  onClick={() => setActiveTab("file")}
+                >
+                  {t.tabFile}
+                </button>
+                <button
+                  className={`tab-btn ${activeTab === "text" ? "active" : ""}`}
+                  onClick={() => setActiveTab("text")}
+                >
+                  {t.tabText}
+                </button>
+              </div>
+
+              {/* Tab: Google Docs */}
+              {activeTab === "gdocs" && (
+                <div className="form-group">
+                  <div className="form-label">
+                    <span>{t.gdocsLabel}</span>
+                    <span className="input-hint">{t.gdocsHint}</span>
+                  </div>
+                  <div className="input-with-actions">
+                    <input
+                      type="text"
+                      className="text-input"
+                      placeholder="https://docs.google.com/document/d/..."
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                    />
+                    <button className="btn-secondary" type="button" onClick={handlePasteUrl}>
+                      {t.paste}
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      type="button"
+                      onClick={() =>
+                        setUrl(
+                          "https://docs.google.com/document/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit"
+                        )
+                      }
+                    >
+                      {t.sample}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab: File Upload */}
+              {activeTab === "file" && (
+                <div className="form-group">
+                  <div
+                    className={`dropzone ${isDragging ? "dragover" : ""}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => document.getElementById("file-input-field").click()}
+                  >
+                    <input
+                      id="file-input-field"
+                      type="file"
+                      accept=".docx,.txt"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          setSelectedFile(e.target.files[0]);
+                        }
+                      }}
+                    />
+                    <div style={{ fontSize: 44 }}>📥</div>
+                    <div style={{ fontWeight: 700 }}>{t.dropzoneTitle}</div>
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>{t.dropzoneSubtitle}</div>
+                  </div>
+
+                  {selectedFile && (
+                    <div className="file-selected-badge">
+                      <span>
+                        📄 <strong>{selectedFile.name}</strong> ({(selectedFile.size / 1024).toFixed(1)} KB)
+                      </span>
+                      <button
+                        className="btn-secondary"
+                        style={{ padding: "4px 8px", fontSize: "0.75rem" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedFile(null);
+                        }}
+                      >
+                        {t.remove}
                       </button>
-                      <a href={item.audio_url} download={`${item.title}.mp3`} className="btn-secondary">
-                        ⬇️ MP3
-                      </a>
-                      <button className="btn-secondary" onClick={() => handlePlayOnMac(item.filename)}>
-                        🔊 Mac
-                      </button>
-                      <button className="btn-danger" onClick={() => handleDeleteAudio(item.filename)}>
-                        {t.delete}
-                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tab: Direct Text */}
+              {activeTab === "text" && (
+                <div className="form-group">
+                  <div className="form-label">
+                    <span>{t.textLabel}</span>
+                    <span className="input-hint">
+                      {rawText.length} {t.chars} (~{rawText.trim() ? rawText.trim().split(/\s+/).length : 0} {t.words})
+                    </span>
+                  </div>
+                  <textarea
+                    className="textarea-input"
+                    placeholder={t.textPlaceholder}
+                    value={rawText}
+                    onChange={(e) => setRawText(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {/* Settings Grid */}
+              <div className="settings-grid">
+                {/* Voice Selection */}
+                <div className="form-group">
+                  <label className="form-label" htmlFor="select-voice">
+                    <span>{t.voiceLabel}</span>
+                  </label>
+                  <select
+                    id="select-voice"
+                    className="select-input"
+                    value={selectedVoice}
+                    onChange={(e) => setSelectedVoice(e.target.value)}
+                  >
+                    {filteredVoices.length > 0 ? (
+                      <optgroup label={LANGUAGES[lang]?.name || "Giọng phù hợp"}>
+                        {filteredVoices.map((v) => (
+                          <option key={v.voice_id} value={v.voice_id}>
+                            {v.gender === "Female" ? "👩" : "👨"} {v.name} ({v.locale})
+                          </option>
+                        ))}
+                      </optgroup>
+                    ) : null}
+                    <optgroup label="Tất cả các giọng khác">
+                      {voices
+                        .filter((v) => !filteredVoices.some((fv) => fv.voice_id === v.voice_id))
+                        .slice(0, 35)
+                        .map((v) => (
+                          <option key={v.voice_id} value={v.voice_id}>
+                            {v.locale} - {v.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </select>
+                </div>
+
+                {/* Speed Slider */}
+                <div className="form-group slider-container">
+                  <div className="form-label">
+                    <span>{t.speedLabel}</span>
+                    <span style={{ fontWeight: 700, color: "var(--primary)" }}>{getRateString()}</span>
+                  </div>
+                  <input
+                    type="range"
+                    className="range-slider"
+                    min="-50"
+                    max="100"
+                    step="5"
+                    value={rateSlider}
+                    onChange={(e) => setRateSlider(parseInt(e.target.value, 10))}
+                  />
+                  <div className="preset-chips">
+                    <button className={`preset-chip ${rateSlider === -20 ? "active" : ""}`} onClick={() => setRateSlider(-20)}>0.8x</button>
+                    <button className={`preset-chip ${rateSlider === 0 ? "active" : ""}`} onClick={() => setRateSlider(0)}>1.0x</button>
+                    <button className={`preset-chip ${rateSlider === 20 ? "active" : ""}`} onClick={() => setRateSlider(20)}>1.2x</button>
+                    <button className={`preset-chip ${rateSlider === 50 ? "active" : ""}`} onClick={() => setRateSlider(50)}>1.5x</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mac Speakers Toggle */}
+              <div className="toggle-row">
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: "0.9rem" }}>{t.macToggle}</div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>{t.macToggleSub}</div>
+                </div>
+                <label className="switch">
+                  <input type="checkbox" checked={playMac} onChange={(e) => setPlayMac(e.target.checked)} />
+                  <span className="switch-slider"></span>
+                </label>
+              </div>
+
+              {/* Conversion Buttons */}
+              {!isLoading ? (
+                <button className="btn-primary-action" type="button" onClick={handleStartRead}>
+                  <span>{t.startBtn}</span>
+                </button>
+              ) : (
+                <div className="processing-card">
+                  <div className="processing-info">
+                    <div className="loader-spinner" style={{ width: 28, height: 28 }}></div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: "0.95rem" }}>{t.processing}</div>
+                      <div style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>{statusMessage}</div>
                     </div>
                   </div>
-                ))}
+                  <button
+                    className="btn-stop-action"
+                    type="button"
+                    disabled={isStopping}
+                    onClick={handleStopProcessing}
+                  >
+                    {isStopping ? t.stopping : t.stopBtn}
+                  </button>
+                </div>
+              )}
+
+              {/* Error Banner */}
+              {error && (
+                <div className="error-banner">
+                  <div style={{ fontSize: 20 }}>⚠️</div>
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{error.message}</div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </section>
-      )}
+
+            {/* PLAYER CARD */}
+            {result && (
+              <section className="player-card">
+                <div className="doc-info-header">
+                  <div>
+                    <div className="doc-title">📖 {result.document_title || "Bản thu âm thanh"}</div>
+                    <div className="doc-stats">
+                      {result.is_partial && <span className="partial-badge">{t.partialBadge}</span>}
+                      {result.word_count ? (
+                        <span className="stat-item">
+                          📝 {result.word_count.toLocaleString()} {t.words}
+                        </span>
+                      ) : null}
+                      {result.voice_used && (
+                        <span className="stat-item">🗣️ {result.voice_used.split("-").slice(-1)[0]}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <a
+                    href={result.audio_url}
+                    download={`${result.is_partial ? "[Một phần] - " : ""}${result.document_title || "speech"}.mp3`}
+                    className="btn-download-mp3"
+                  >
+                    {t.downloadMp3}
+                  </a>
+                </div>
+
+                <audio
+                  ref={audioRef}
+                  src={result.audio_url}
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                  onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)}
+                  onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
+                />
+
+                <div className={`wave-visualizer ${isPlaying ? "playing" : ""}`}>
+                  {Array.from({ length: 44 }).map((_, idx) => (
+                    <div key={idx} className="wave-bar"></div>
+                  ))}
+                </div>
+
+                <div className="audio-controls-row">
+                  <button className="skip-btn" onClick={() => handleSkip(-10)} title="Tua lùi 10 giây">
+                    -10s
+                  </button>
+                  <button className="skip-btn" onClick={() => handleSkip(-5)} title="Tua lùi 5 giây">
+                    -5s
+                  </button>
+
+                  <button className="play-pause-btn" onClick={togglePlay} title={isPlaying ? "Tạm dừng" : "Phát"}>
+                    {isPlaying ? "⏸" : "▶"}
+                  </button>
+
+                  <button className="skip-btn" onClick={() => handleSkip(5)} title="Tua tiến 5 giây">
+                    +5s
+                  </button>
+                  <button className="skip-btn" onClick={() => handleSkip(10)} title="Tua tiến 10 giây">
+                    +10s
+                  </button>
+
+                  <div className="progress-section">
+                    <input
+                      type="range"
+                      className="audio-progress-bar"
+                      min="0"
+                      max={duration || 100}
+                      step="0.1"
+                      value={currentTime}
+                      onChange={handleSeek}
+                    />
+                    <div className="time-display">
+                      <span>{formatTime(currentTime)}</span>
+                      <span>{formatTime(duration)}</span>
+                    </div>
+                  </div>
+
+                  <div className="volume-control-box">
+                    <button className="mute-btn" onClick={toggleMute} title="Bật/Tắt tiếng">
+                      {isMuted || volume === 0 ? "🔇" : "🔊"}
+                    </button>
+                    <input
+                      type="range"
+                      className="volume-slider"
+                      min="0"
+                      max="1"
+                      step="0.05"
+                      value={isMuted ? 0 : volume}
+                      onChange={handleVolumeChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="player-aux-actions">
+                  <span style={{ fontSize: "0.82rem", color: "var(--text-muted)" }}>Tốc độ phát:</span>
+                  {[0.75, 1, 1.25, 1.5, 2].map((spd) => (
+                    <button
+                      key={spd}
+                      className={`preset-chip ${playerSpeed === spd ? "active" : ""}`}
+                      onClick={() => changeSpeed(spd)}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+
+                  <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => handlePlayOnMac(result.audio_filename)}
+                      disabled={isMacPlaying}
+                    >
+                      {isMacPlaying ? t.playingMac : t.playMac}
+                    </button>
+                  </div>
+                </div>
+              </section>
+            )}
+          </>
+        )}
+
+        {/* VIEW 2: AUDIO LIBRARY */}
+        {currentView === "library" && (
+          <div className="glass-card">
+            <div className="library-header">
+              <div>
+                <h2 style={{ fontSize: "1.35rem", fontWeight: 800 }}>{t.libraryTitle}</h2>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
+                  Lưu trữ {libraryFiles.length} bản ghi âm thanh đã được chuyển đổi
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input
+                  type="text"
+                  className="library-search-input"
+                  placeholder={t.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button className="btn-secondary" onClick={fetchLibrary} title="Làm mới">
+                  🔄
+                </button>
+              </div>
+            </div>
+
+            {libraryFiles.length === 0 ? (
+              <div className="empty-state">
+                <div style={{ fontSize: 48 }}>📭</div>
+                <p>{t.emptyLibrary}</p>
+              </div>
+            ) : (
+              <div className="library-cards-list">
+                {libraryFiles
+                  .filter(
+                    (item) =>
+                      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      item.filename.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((item) => (
+                    <div key={item.filename} className="library-card">
+                      <div className="library-item-info">
+                        <div className="library-item-title">
+                          {item.title}
+                          {item.is_partial && (
+                            <span className="partial-badge" style={{ marginLeft: 8 }}>
+                              {t.partialBadge}
+                            </span>
+                          )}
+                        </div>
+                        <div className="library-item-meta">
+                          <span>📅 {item.created_at}</span>
+                          <span>💾 {item.size_formatted}</span>
+                        </div>
+                      </div>
+
+                      <div className="library-item-actions">
+                        <button className="btn-secondary" onClick={() => handlePlayLibraryItem(item)}>
+                          {t.playNow}
+                        </button>
+                        <a href={item.audio_url} download={`${item.title}.mp3`} className="btn-secondary">
+                          ⬇️ MP3
+                        </a>
+                        <button className="btn-secondary" onClick={() => handlePlayOnMac(item.filename)}>
+                          🔊 Mac
+                        </button>
+                        <button className="btn-danger" onClick={() => handleDeleteAudio(item.filename)}>
+                          {t.delete}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

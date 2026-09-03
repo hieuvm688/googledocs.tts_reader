@@ -58,13 +58,19 @@ source .venv/bin/activate
 # (Nếu tạo mới: pip install -r requirements.txt)
 ```
 
-### 2. Khởi chạy Giao Diện Web React Local (Khuyên dùng)
+### 2. Khởi chạy Giao Diện Webapp Enterprise Local (Khuyên dùng)
 Chỉ cần chạy lệnh sau, hệ thống sẽ tự động khởi động server và mở trình duyệt web:
 ```bash
 ./run_web.sh
 # Hoặc: ./run.sh web
 ```
-- **Tính năng Web:** Giao diện trực quan hiện đại, hỗ trợ dán link Google Docs, kéo thả file `.docx`/`.txt`, hoặc nhập văn bản trực tiếp. Tích hợp sẵn trình phát âm thanh (tua nhanh/lùi, chỉnh tốc độ đọc, tải MP3 về máy, chọn giọng Hoài My/Nam Minh, lưu lịch sử gần đây).
+- **🌟 Tính năng Webapp Enterprise v2.2:**
+  - **Thanh điều hướng Sidebar dọc bên trái (Left Sidebar):** Thiết kế chuẩn Enterprise hiện đại, chuyển đổi tức thì giữa **Studio Chuyển Đổi** và **Thư Viện Audio**.
+  - **⚡ Xử lý song song siêu tốc (Parallel Synthesis):** Tự động phân đoạn và tổng hợp song song đa luồng qua Edge Neural, tăng tốc độ hoàn thành nhanh gấp 3–5 lần.
+  - **⏹️ Nút "Dừng xử lý" & Giữ âm thanh:** Cho phép dừng chuyển đổi bất kỳ lúc nào; đoạn âm thanh đã hoàn tất trước đó được bảo toàn thành file MP3 để nghe hoặc tải về máy.
+  - **🌐 Đa Ngôn Ngữ (Multilanguage 11 Ngôn Ngữ):** Chuyển đổi giao diện và tự động lọc giọng đọc AI tương ứng cho 11 quốc gia (`vi`, `en`, `cn`, `es`, `fr`, `jp`, `ru`, `ar`, `hi`, `de`, `ko`).
+  - **📁 Thư Viện Audio (Archive & Management):** Quản lý toàn bộ các bản thu đã tạo, hỗ trợ tìm kiếm, phát ngay, tải MP3, phát loa Mac, và xóa file.
+  - **🎛️ Bộ Điều Khiển Player Hoàn Hảo:** Nút Play/Pause, tua lùi/tiến 5s & 10s, thanh trượt scrubber, âm lượng & mute, tùy chỉnh tốc độ đọc, tải MP3 trực tiếp.
 
 ### 3. Sử dụng qua dòng lệnh Terminal (CLI)
 
