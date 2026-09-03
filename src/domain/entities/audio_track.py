@@ -10,6 +10,7 @@ class AudioTrack:
     format: str  # e.g., 'mp3', 'wav'
     duration_seconds: Optional[float] = None
     file_size_bytes: int = 0
+    is_partial: bool = False
 
     def exists(self) -> bool:
         """Kiểm tra tệp âm thanh có tồn tại trên đĩa không."""

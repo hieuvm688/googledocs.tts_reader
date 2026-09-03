@@ -22,6 +22,7 @@ class ReadAndSpeakResult:
     audio_path: str
     playback_successful: bool
     summary_message: str
+    is_partial: bool = False
 
 @dataclass(frozen=True)
 class VoiceDto:

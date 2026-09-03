@@ -7,8 +7,9 @@ import asyncio
 import os
 import uuid
 import webbrowser
+from datetime import datetime
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 from aiohttp import web
 from rich.console import Console
@@ -43,7 +44,7 @@ def create_web_container() -> Tuple[ReadAndSpeakUseCase, ListVoicesUseCase, MacA
         DocxFileAdapter(),
         RawTextAdapter(),
     ]
-    tts_engine = EdgeTtsAdapter()
+    tts_engine = EdgeTtsAdapter(max_concurrency=3)
     audio_player = MacAfplayAdapter()
 
     read_and_speak_uc = ReadAndSpeakUseCase(
@@ -68,6 +69,8 @@ class WebTtsController:
         self._read_and_speak_uc = read_and_speak_uc
         self._list_voices_uc = list_voices_uc
         self._audio_player = audio_player
+        self._active_jobs: Dict[str, asyncio.Task] = {}
+        self._job_metadata: Dict[str, dict] = {}
 
     async def get_index(self, request: web.Request) -> web.Response:
         """Phục vụ file index.html chính."""
@@ -77,8 +80,8 @@ class WebTtsController:
         return web.FileResponse(index_file)
 
     async def get_voices(self, request: web.Request) -> web.Response:
-        """API lấy danh sách giọng đọc."""
-        locale = request.query.get("locale", "vi")
+        """API lấy danh sách giọng đọc theo locale."""
+        locale = request.query.get("locale", "")
         try:
             voices = await self._list_voices_uc.execute(locale_prefix=locale)
             data = [
@@ -106,6 +109,7 @@ class WebTtsController:
         voice_id: str = "vi-VN-HoaiMyNeural"
         rate: str = "+0%"
         play_mac: bool = False
+        job_id: str = uuid.uuid4().hex[:12]
 
         if "multipart" in content_type:
             # Xử lý upload tệp
@@ -132,6 +136,10 @@ class WebTtsController:
                     voice_id = (await part.text()).strip() or voice_id
                 elif field_name == "rate":
                     rate = (await part.text()).strip() or rate
+                elif field_name == "job_id":
+                    val = (await part.text()).strip()
+                    if val:
+                        job_id = val
                 elif field_name == "play_mac":
                     val = (await part.text()).strip().lower()
                     play_mac = val in ["true", "1", "yes"]
@@ -158,6 +166,8 @@ class WebTtsController:
             voice_id = body.get("voice", "vi-VN-HoaiMyNeural")
             rate = body.get("rate", "+0%")
             play_mac = bool(body.get("play_mac", False))
+            if body.get("job_id"):
+                job_id = str(body["job_id"]).strip()
 
             if not raw_value:
                 return web.json_response(
@@ -166,13 +176,12 @@ class WebTtsController:
                 )
 
             if input_type == "text":
-                # Nhập trực tiếp văn bản
                 source_path_or_url = f"text://{raw_value}"
             else:
                 source_path_or_url = raw_value
 
         # Tạo tên file output riêng biệt
-        output_filename = f"tts_{uuid.uuid4().hex[:12]}.mp3"
+        output_filename = f"tts_{job_id}.mp3"
         output_file_path = OUTPUT_AUDIO_DIR / output_filename
 
         tts_req = ReadAndSpeakRequest(
@@ -183,11 +192,24 @@ class WebTtsController:
             play_audio=play_mac
         )
 
+        current_task = asyncio.current_task()
+        if current_task:
+            self._active_jobs[job_id] = current_task
+
+        self._job_metadata[job_id] = {
+            "audio_filename": output_filename,
+            "document_title": "Tài liệu",
+            "voice_used": voice_id
+        }
+
         try:
             result = await self._read_and_speak_uc.execute(tts_req)
+            self._job_metadata[job_id]["document_title"] = result.document_title
+
             return web.json_response({
-                "status": "success",
+                "status": "partial" if result.is_partial else "success",
                 "data": {
+                    "job_id": job_id,
                     "document_title": result.document_title,
                     "character_count": result.character_count,
                     "word_count": result.word_count,
@@ -195,8 +217,29 @@ class WebTtsController:
                     "audio_filename": output_filename,
                     "audio_url": f"/api/audio/{output_filename}",
                     "playback_mac": result.playback_successful,
+                    "is_partial": result.is_partial,
                     "summary_message": result.summary_message
                 }
+            })
+        except asyncio.CancelledError:
+            # Khi bị hủy giữa chừng từ API stop
+            if output_file_path.exists() and output_file_path.stat().st_size > 0:
+                meta = self._job_metadata.get(job_id, {})
+                return web.json_response({
+                    "status": "partial",
+                    "data": {
+                        "job_id": job_id,
+                        "document_title": meta.get("document_title", "Tài liệu (Một phần)"),
+                        "audio_filename": output_filename,
+                        "audio_url": f"/api/audio/{output_filename}",
+                        "is_partial": True,
+                        "playback_mac": False,
+                        "summary_message": "Đã dừng xử lý. Đoạn âm thanh thu được đã sẵn sàng để nghe hoặc tải về."
+                    }
+                })
+            return web.json_response({
+                "status": "stopped",
+                "message": "Quá trình xử lý đã được dừng."
             })
         except GDocsTtsException as err:
             return web.json_response(
@@ -216,6 +259,94 @@ class WebTtsController:
                 },
                 status=500
             )
+        finally:
+            self._active_jobs.pop(job_id, None)
+
+    async def post_stop(self, request: web.Request) -> web.Response:
+        """API dừng tiến trình xử lý TTS giữa chừng."""
+        try:
+            body = await request.json()
+            job_id = body.get("job_id", "")
+        except Exception:
+            return web.json_response({"status": "error", "message": "Dữ liệu không hợp lệ."}, status=400)
+
+        if not job_id:
+            return web.json_response({"status": "error", "message": "Thiếu mã job_id."}, status=400)
+
+        task = self._active_jobs.get(job_id)
+        if task and not task.done():
+            task.cancel()
+            try:
+                # Đợi một chút để task kết thúc và ghi file an toàn
+                await asyncio.wait_for(asyncio.shield(task), timeout=1.5)
+            except Exception:
+                pass
+
+        # Kiểm tra file đã tạo
+        meta = self._job_metadata.get(job_id, {})
+        filename = meta.get("audio_filename", f"tts_{job_id}.mp3")
+        file_path = OUTPUT_AUDIO_DIR / filename
+
+        if file_path.exists() and file_path.stat().st_size > 0:
+            return web.json_response({
+                "status": "partial",
+                "data": {
+                    "job_id": job_id,
+                    "document_title": meta.get("document_title", "Tài liệu (Một phần)"),
+                    "audio_filename": filename,
+                    "audio_url": f"/api/audio/{filename}",
+                    "is_partial": True,
+                    "playback_mac": False,
+                    "summary_message": "Đã dừng xử lý. Đoạn âm thanh thu được đã sẵn sàng để nghe hoặc tải về."
+                }
+            })
+
+        return web.json_response({
+            "status": "stopped",
+            "message": "Đã dừng tiến trình chuyển đổi."
+        })
+
+    async def get_library(self, request: web.Request) -> web.Response:
+        """API trả về danh sách toàn bộ các file audio trong thư viện."""
+        audio_files = []
+        try:
+            for file_p in sorted(OUTPUT_AUDIO_DIR.glob("*.mp3"), key=lambda p: p.stat().st_mtime, reverse=True):
+                stat = file_p.stat()
+                size_kb = stat.st_size / 1024
+                size_formatted = f"{size_kb:.1f} KB" if size_kb < 1024 else f"{size_kb/1024:.2f} MB"
+                created_str = datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+
+                # Trích xuất tiêu đề từ metadata hoặc tên file
+                clean_name = file_p.stem
+                is_partial = "partial" in clean_name.lower()
+
+                audio_files.append({
+                    "filename": file_p.name,
+                    "title": clean_name.replace("tts_", "Bản thu "),
+                    "size_bytes": stat.st_size,
+                    "size_formatted": size_formatted,
+                    "created_at": created_str,
+                    "is_partial": is_partial,
+                    "audio_url": f"/api/audio/{file_p.name}"
+                })
+            return web.json_response({"status": "success", "data": audio_files})
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": str(exc)}, status=500)
+
+    async def delete_audio(self, request: web.Request) -> web.Response:
+        """API xóa tệp âm thanh khỏi thư viện."""
+        filename = request.match_info.get("filename", "")
+        safe_filename = Path(filename).name
+        file_path = OUTPUT_AUDIO_DIR / safe_filename
+
+        if not file_path.exists() or not file_path.is_file():
+            return web.json_response({"status": "error", "message": "Không tìm thấy tệp cần xóa."}, status=404)
+
+        try:
+            file_path.unlink()
+            return web.json_response({"status": "success", "message": "Đã xóa tệp âm thanh thành công."})
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": f"Không thể xóa tệp: {str(exc)}"}, status=500)
 
     async def get_audio(self, request: web.Request) -> web.Response:
         """API stream tệp âm thanh MP3 để trình duyệt phát hoặc tải về."""
@@ -265,6 +396,9 @@ def build_web_app() -> web.Application:
     app.router.add_get("/api/health", controller.get_health)
     app.router.add_get("/api/voices", controller.get_voices)
     app.router.add_post("/api/read", controller.post_read)
+    app.router.add_post("/api/stop", controller.post_stop)
+    app.router.add_get("/api/library", controller.get_library)
+    app.router.add_delete("/api/audio/{filename}", controller.delete_audio)
     app.router.add_get("/api/audio/{filename}", controller.get_audio)
     app.router.add_post("/api/play-mac", controller.post_play_mac)
 

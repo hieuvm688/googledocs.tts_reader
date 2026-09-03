@@ -99,3 +99,26 @@ async def test_post_read_file_upload():
         res = data["data"]
         assert res["word_count"] > 0
         assert res["audio_url"].startswith("/api/audio/")
+
+@pytest.mark.asyncio
+async def test_library_and_delete_endpoints():
+    app = build_web_app()
+    async with TestClient(TestServer(app)) as client:
+        # Lấy danh sách library
+        resp = await client.get("/api/library")
+        assert resp.status == 200
+        data = await resp.json()
+        assert data["status"] == "success"
+        assert isinstance(data["data"], list)
+
+        # Thử gọi delete cho file không tồn tại -> 404
+        del_resp = await client.delete("/api/audio/non_existent_file.mp3")
+        assert del_resp.status == 404
+
+@pytest.mark.asyncio
+async def test_stop_endpoint():
+    app = build_web_app()
+    async with TestClient(TestServer(app)) as client:
+        # Stop một job không tồn tại -> 404 hoặc stopped
+        resp = await client.post("/api/stop", json={"job_id": "fake_job_123"})
+        assert resp.status in [200, 404]

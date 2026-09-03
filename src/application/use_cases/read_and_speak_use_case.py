@@ -76,5 +76,8 @@ class ReadAndSpeakUseCase:
             summary_message=(
                 f"Đã đọc xong tài liệu '{document.title}' ({document.word_count} từ) "
                 f"bằng giọng '{voice_id}'."
-            )
+                if not audio_track.is_partial
+                else f"Đã dừng xử lý. Đoạn âm thanh thu được đã sẵn sàng để nghe hoặc tải về."
+            ),
+            is_partial=audio_track.is_partial
         )
