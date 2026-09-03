@@ -71,7 +71,9 @@ Chỉ cần chạy lệnh sau, hệ thống sẽ tự động khởi động ser
   - **⚡ Xử lý song song siêu tốc (Parallel Synthesis):** Tự động phân đoạn và tổng hợp song song đa luồng qua Edge Neural, tăng tốc độ hoàn thành nhanh gấp 3–5 lần.
   - **⏹️ Nút "Dừng xử lý" & Giữ âm thanh:** Cho phép dừng chuyển đổi bất kỳ lúc nào; đoạn âm thanh đã hoàn tất trước đó được bảo toàn thành file MP3 để nghe hoặc tải về máy.
   - **🌐 Đa Ngôn Ngữ (Multilanguage 11 Ngôn Ngữ):** Chuyển đổi giao diện và tự động lọc giọng đọc AI tương ứng cho 11 quốc gia (`vi`, `en`, `cn`, `es`, `fr`, `jp`, `ru`, `ar`, `hi`, `de`, `ko`).
-  - **📁 Thư Viện Audio (Archive & Management):** Quản lý toàn bộ các bản thu đã tạo, hỗ trợ tìm kiếm, phát ngay, tải MP3, phát loa Mac, và xóa file.
+  - **✏️ Đổi Tên Bản Thu (Rename Audio):** Chỉnh sửa tiêu đề tùy ý cho bất kỳ bản thu nào trong Thư viện Audio; hệ thống lưu trữ đồng bộ vào `metadata.json` và cập nhật tức thì trên trình phát.
+  - **🗑️ Hộp Thoại Xóa An Toàn & "Không hỏi lại":** Modal xác nhận xóa Glassmorphism sang trọng kèm checkbox "Không hỏi lại lần sau" (lưu vào `localStorage`) giúp thao tác nhanh và an toàn.
+  - **📁 Thư Viện Audio (Archive & Management):** Quản lý toàn bộ các bản thu đã tạo, hỗ trợ tìm kiếm, đổi tên, phát ngay, tải MP3, phát loa Mac, và xóa file.
   - **🎛️ Bộ Điều Khiển Player Hoàn Hảo:** Nút Play/Pause, tua lùi/tiến 5s & 10s, thanh trượt scrubber, âm lượng & mute, tùy chỉnh tốc độ đọc, tải MP3 trực tiếp.
 
 ### 3. Sử dụng qua dòng lệnh Terminal (CLI)

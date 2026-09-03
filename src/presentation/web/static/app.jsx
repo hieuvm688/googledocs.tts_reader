@@ -67,6 +67,18 @@ const I18N = {
     backgroundAudioPlaying: "audio đang phát dưới nền",
     manageSessions: "Quản lý",
     refresh: "Làm mới",
+    rename: "Đổi tên",
+    renameModalTitle: "Đổi Tên Bản Thu Âm Thanh",
+    renameInputLabel: "Tiêu đề bản thu mới:",
+    renamePlaceholder: "Nhập tên mới cho bản thu...",
+    deleteModalTitle: "Xác Nhận Xóa Bản Thu",
+    deleteModalMessage: "Bạn có chắc chắn muốn xóa vĩnh viễn bản thu này khỏi máy tính? Thao tác này không thể hoàn tác.",
+    dontAskAgain: "Không hỏi lại lần sau",
+    save: "Lưu thay đổi",
+    cancel: "Hủy",
+    saving: "Đang lưu...",
+    resetDeleteConfirm: "Bật lại hỏi khi xóa",
+    skipConfirmActive: "Đang bật xóa nhanh (Không hỏi lại)",
   },
   en: {
     appTitle: "Google Docs TTS Studio",
@@ -118,6 +130,18 @@ const I18N = {
     backgroundAudioPlaying: "audio tracks playing in background",
     manageSessions: "Manage",
     refresh: "Refresh",
+    rename: "Rename",
+    renameModalTitle: "Rename Audio Recording",
+    renameInputLabel: "New audio title:",
+    renamePlaceholder: "Enter new title...",
+    deleteModalTitle: "Confirm Audio Deletion",
+    deleteModalMessage: "Are you sure you want to permanently delete this audio recording? This action cannot be undone.",
+    dontAskAgain: "Do not ask again",
+    save: "Save Changes",
+    cancel: "Cancel",
+    saving: "Saving...",
+    resetDeleteConfirm: "Enable delete prompt",
+    skipConfirmActive: "Quick delete enabled (No confirmation)",
   },
   cn: {
     appTitle: "Google Docs 语音工作台",
@@ -528,6 +552,24 @@ function App() {
   const [libraryFiles, setLibraryFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [skipDeleteConfirm, setSkipDeleteConfirm] = useState(() => {
+    return localStorage.getItem("gdocs_tts_skip_delete_confirm") === "true";
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    filename: "",
+    title: "",
+    dontAskAgain: false,
+  });
+  const [renameModal, setRenameModal] = useState({
+    isOpen: false,
+    filename: "",
+    currentTitle: "",
+    newTitle: "",
+    isSaving: false,
+    error: "",
+  });
+
   useEffect(() => {
     document.body.className = theme === "dark" ? "theme-dark" : "theme-light";
     localStorage.setItem("gdocs_tts_theme", theme);
@@ -717,12 +759,33 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && audioRef.current) {
+        setIsPlaying(!audioRef.current.paused);
+        setCurrentTime(audioRef.current.currentTime);
+        if (!isNaN(audioRef.current.duration) && audioRef.current.duration > 0) {
+          setDuration(audioRef.current.duration);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   const togglePlay = () => {
     if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
+    if (audioRef.current.paused) {
+      const p = audioRef.current.play();
+      if (p !== undefined) {
+        p.then(() => setIsPlaying(true)).catch((err) => {
+          console.warn("Audio play error:", err);
+          setIsPlaying(false);
+        });
+      }
     } else {
-      audioRef.current.play();
+      audioRef.current.pause();
+      setIsPlaying(false);
     }
   };
 
@@ -813,8 +876,34 @@ function App() {
     }
   };
 
-  const handleDeleteAudio = async (filename) => {
-    if (!confirm(t.deleteConfirm)) return;
+  // Mở yêu cầu xóa bản thu (kiểm tra trạng thái Không hỏi lại)
+  const handleRequestDelete = (item) => {
+    if (skipDeleteConfirm) {
+      performDeleteAudio(item.filename);
+    } else {
+      setDeleteModal({
+        isOpen: true,
+        filename: item.filename,
+        title: item.title || item.filename,
+        dontAskAgain: false,
+      });
+    }
+  };
+
+  // Xác nhận xóa từ Modal
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.filename) return;
+    const targetFilename = deleteModal.filename;
+    if (deleteModal.dontAskAgain) {
+      localStorage.setItem("gdocs_tts_skip_delete_confirm", "true");
+      setSkipDeleteConfirm(true);
+    }
+    setDeleteModal({ isOpen: false, filename: "", title: "", dontAskAgain: false });
+    await performDeleteAudio(targetFilename);
+  };
+
+  // Thực hiện gọi API xóa
+  const performDeleteAudio = async (filename) => {
     try {
       const res = await fetch(`/api/audio/${filename}`, { method: "DELETE" });
       if (res.ok) {
@@ -822,9 +911,67 @@ function App() {
         if (result && result.audio_filename === filename) {
           setResult(null);
         }
+      } else {
+        const errData = await res.json();
+        alert("Lỗi khi xóa: " + (errData.message || "Không thể xóa tệp"));
       }
     } catch (err) {
       alert("Lỗi khi xóa: " + err.message);
+    }
+  };
+
+  // Mở modal đổi tên
+  const handleOpenRenameModal = (item) => {
+    setRenameModal({
+      isOpen: true,
+      filename: item.filename,
+      currentTitle: item.title,
+      newTitle: item.title,
+      isSaving: false,
+      error: "",
+    });
+  };
+
+  // Xác nhận lưu tên mới
+  const handleConfirmRename = async (e) => {
+    if (e) e.preventDefault();
+    const trimmedTitle = renameModal.newTitle.trim();
+    if (!trimmedTitle) {
+      setRenameModal((prev) => ({ ...prev, error: "Tiêu đề không được để trống" }));
+      return;
+    }
+    setRenameModal((prev) => ({ ...prev, isSaving: true, error: "" }));
+
+    try {
+      const res = await fetch(`/api/audio/${renameModal.filename}/rename`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ new_title: trimmedTitle }),
+      });
+      const data = await res.json();
+      if (res.ok && data.status === "success") {
+        setLibraryFiles((prev) =>
+          prev.map((f) =>
+            f.filename === renameModal.filename ? { ...f, title: trimmedTitle } : f
+          )
+        );
+        if (result && result.audio_filename === renameModal.filename) {
+          setResult((prev) => (prev ? { ...prev, document_title: trimmedTitle } : null));
+        }
+        setRenameModal({ isOpen: false, filename: "", currentTitle: "", newTitle: "", isSaving: false, error: "" });
+      } else {
+        setRenameModal((prev) => ({
+          ...prev,
+          isSaving: false,
+          error: data.message || "Không thể đổi tên",
+        }));
+      }
+    } catch (err) {
+      setRenameModal((prev) => ({
+        ...prev,
+        isSaving: false,
+        error: "Lỗi kết nối: " + err.message,
+      }));
     }
   };
 
@@ -851,6 +998,33 @@ function App() {
 
   return (
     <div className="enterprise-layout">
+      {/* PERSISTENT GLOBAL AUDIO ELEMENT (NEVER DESTROYED ON TAB SWITCH) */}
+      <audio
+        ref={audioRef}
+        src={result ? result.audio_url : ""}
+        preload="auto"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={() => {
+          setIsPlaying(false);
+          setCurrentTime(0);
+        }}
+        onTimeUpdate={() => {
+          if (audioRef.current) {
+            setCurrentTime(audioRef.current.currentTime);
+          }
+        }}
+        onLoadedMetadata={() => {
+          if (audioRef.current) {
+            setDuration(audioRef.current.duration);
+          }
+        }}
+        onError={(e) => {
+          console.warn("Audio playback error:", e);
+          setIsPlaying(false);
+        }}
+      />
+
       {/* LEFT SIDEBAR */}
       <aside className="app-sidebar">
         {/* Brand */}
@@ -1248,16 +1422,6 @@ function App() {
                   </a>
                 </div>
 
-                <audio
-                  ref={audioRef}
-                  src={result.audio_url}
-                  onPlay={() => setIsPlaying(true)}
-                  onPause={() => setIsPlaying(false)}
-                  onEnded={() => setIsPlaying(false)}
-                  onTimeUpdate={() => audioRef.current && setCurrentTime(audioRef.current.currentTime)}
-                  onLoadedMetadata={() => audioRef.current && setDuration(audioRef.current.duration)}
-                />
-
                 <div className={`wave-visualizer ${isPlaying ? "playing" : ""}`}>
                   {Array.from({ length: 44 }).map((_, idx) => (
                     <div key={idx} className="wave-bar"></div>
@@ -1359,9 +1523,26 @@ function App() {
             <div className="library-header">
               <div>
                 <h2 style={{ fontSize: "1.35rem", fontWeight: 800 }}>{t.libraryTitle}</h2>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                  Lưu trữ {libraryFiles.length} bản ghi âm thanh đã được chuyển đổi
-                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0 }}>
+                    Lưu trữ {libraryFiles.length} bản ghi âm thanh đã được chuyển đổi
+                  </p>
+                  {skipDeleteConfirm && (
+                    <span className="skip-confirm-pill">
+                      ⚡ {t.skipConfirmActive || "Xóa nhanh"}
+                      <button
+                        className="btn-reset-confirm"
+                        onClick={() => {
+                          localStorage.removeItem("gdocs_tts_skip_delete_confirm");
+                          setSkipDeleteConfirm(false);
+                        }}
+                        title="Bật lại hộp thoại hỏi xác nhận trước khi xóa"
+                      >
+                        [Bật lại hỏi xác nhận]
+                      </button>
+                    </span>
+                  )}
+                </div>
               </div>
               <div style={{ display: "flex", gap: 10 }}>
                 <input
@@ -1411,6 +1592,13 @@ function App() {
                         <button className="btn-secondary" onClick={() => handlePlayLibraryItem(item)}>
                           {t.playNow}
                         </button>
+                        <button
+                          className="btn-secondary"
+                          onClick={() => handleOpenRenameModal(item)}
+                          title={t.rename || "Đổi tên"}
+                        >
+                          ✏️ {t.rename || "Đổi tên"}
+                        </button>
                         <a href={item.audio_url} download={`${item.title}.mp3`} className="btn-secondary">
                           ⬇️ MP3
                         </a>
@@ -1434,7 +1622,7 @@ function App() {
                             🔊 Mac
                           </button>
                         )}
-                        <button className="btn-danger" onClick={() => handleDeleteAudio(item.filename)}>
+                        <button className="btn-danger" onClick={() => handleRequestDelete(item)}>
                           {t.delete}
                         </button>
                       </div>
@@ -1533,7 +1721,169 @@ function App() {
             )}
           </div>
         )}
+
+        {/* PERSISTENT FLOATING PLAYER (VISIBLE ACROSS ALL TABS WHEN AUDIO IS LOADED) */}
+        {result && currentView !== "converter" && (
+          <div className="floating-bottom-player">
+            <div className="floating-player-left">
+              <div className="floating-player-icon">🎵</div>
+              <div className="floating-player-text">
+                <span className="floating-player-title">{result.document_title || "Bản thu âm thanh"}</span>
+                <span className="floating-player-time">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
+            </div>
+            <div className="floating-player-controls">
+              <button className="skip-btn-mini" onClick={() => handleSkip(-10)} title="Tua lùi 10 giây">
+                ⏪ 10s
+              </button>
+              <button className="play-pause-btn-mini" onClick={togglePlay} title={isPlaying ? "Tạm dừng" : "Phát"}>
+                {isPlaying ? "⏸️" : "▶️"}
+              </button>
+              <button className="skip-btn-mini" onClick={() => handleSkip(10)} title="Tua tiến 10 giây">
+                10s ⏩
+              </button>
+              <input
+                type="range"
+                className="floating-seek-slider"
+                min="0"
+                max={duration || 100}
+                step="0.1"
+                value={currentTime}
+                onChange={handleSeek}
+              />
+            </div>
+            <div className="floating-player-right">
+              <button className="btn-return-studio" onClick={() => setCurrentView("converter")}>
+                🎙️ Quay lại Studio
+              </button>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* MODAL: XÁC NHẬN XÓA BẢN THU (CÓ CHECKBOX KHÔNG HỎI LẠI) */}
+      {deleteModal.isOpen && (
+        <div className="modal-backdrop" onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })}>
+          <div className="modal-card modal-delete-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title-row">
+                <span className="modal-icon-danger">🗑️</span>
+                <h3>{t.deleteModalTitle || "Xác Nhận Xóa Bản Thu"}</h3>
+              </div>
+              <button
+                className="modal-close-btn"
+                onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+                title={t.cancel || "Đóng"}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-desc">
+                {t.deleteModalMessage || "Bạn có chắc chắn muốn xóa vĩnh viễn bản thu này khỏi máy tính? Thao tác này không thể hoàn tác."}
+              </p>
+              <div className="modal-target-box">
+                <div className="modal-target-title">📖 {deleteModal.title || deleteModal.filename}</div>
+                <div className="modal-target-filename">📁 {deleteModal.filename}</div>
+              </div>
+              <label className="checkbox-container dont-ask-container">
+                <input
+                  type="checkbox"
+                  checked={deleteModal.dontAskAgain}
+                  onChange={(e) => setDeleteModal({ ...deleteModal, dontAskAgain: e.target.checked })}
+                />
+                <span className="checkbox-custom"></span>
+                <span className="checkbox-label-text">
+                  {t.dontAskAgain || "Không hỏi lại lần sau"}
+                </span>
+              </label>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn-secondary"
+                onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+              >
+                {t.cancel || "Hủy"}
+              </button>
+              <button className="btn-danger" onClick={handleConfirmDelete}>
+                🗑️ {t.delete || "Xóa vĩnh viễn"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ĐỔI TÊN BẢN THU (RENAME MODAL) */}
+      {renameModal.isOpen && (
+        <div
+          className="modal-backdrop"
+          onClick={() => !renameModal.isSaving && setRenameModal({ ...renameModal, isOpen: false })}
+        >
+          <div className="modal-card modal-rename-card" onClick={(e) => e.stopPropagation()}>
+            <form onSubmit={handleConfirmRename}>
+              <div className="modal-header">
+                <div className="modal-title-row">
+                  <span className="modal-icon-primary">✏️</span>
+                  <h3>{t.renameModalTitle || "Đổi Tên Bản Thu Âm Thanh"}</h3>
+                </div>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setRenameModal({ ...renameModal, isOpen: false })}
+                  disabled={renameModal.isSaving}
+                  title={t.cancel || "Đóng"}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-desc">
+                  Đặt tiêu đề mới để dễ dàng quản lý và tìm kiếm bản thu trong thư viện:
+                </p>
+                <div className="modal-input-group">
+                  <label className="input-label">
+                    {t.renameInputLabel || "Tiêu đề bản thu mới:"}
+                  </label>
+                  <input
+                    type="text"
+                    className="modal-text-input"
+                    value={renameModal.newTitle}
+                    onChange={(e) => setRenameModal({ ...renameModal, newTitle: e.target.value, error: "" })}
+                    placeholder={t.renamePlaceholder || "Nhập tên mới cho bản thu..."}
+                    autoFocus
+                    disabled={renameModal.isSaving}
+                  />
+                  {renameModal.error && (
+                    <div className="modal-error-text">⚠️ {renameModal.error}</div>
+                  )}
+                  <div className="modal-target-filename" style={{ marginTop: 8 }}>
+                    📁 Tệp gốc: {renameModal.filename}
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setRenameModal({ ...renameModal, isOpen: false })}
+                  disabled={renameModal.isSaving}
+                >
+                  {t.cancel || "Hủy"}
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={renameModal.isSaving || !renameModal.newTitle.trim()}
+                >
+                  {renameModal.isSaving ? (t.saving || "Đang lưu...") : `💾 ${t.save || "Lưu thay đổi"}`}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

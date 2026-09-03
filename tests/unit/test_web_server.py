@@ -148,3 +148,43 @@ async def test_playback_endpoints():
         # 4. Play mac with non-existent file -> 404
         play_resp = await client.post("/api/play-mac", json={"filename": "non_existent.mp3"})
         assert play_resp.status == 404
+
+@pytest.mark.asyncio
+async def test_rename_audio_endpoint():
+    app = build_web_app()
+    async with TestClient(TestServer(app)) as client:
+        # 1. Rename file không tồn tại -> 404
+        resp = await client.post("/api/audio/non_existent.mp3/rename", json={"new_title": "Tên Mới"})
+        assert resp.status == 404
+
+        # 2. Rename với title rỗng -> 400
+        resp_empty = await client.post("/api/audio/fake.mp3/rename", json={"new_title": "  "})
+        assert resp_empty.status in [400, 404]
+
+        # 3. Tạo một file mp3 giả trong OUTPUT_AUDIO_DIR
+        from src.presentation.web.web_server import OUTPUT_AUDIO_DIR
+        test_file = OUTPUT_AUDIO_DIR / "test_rename_sample.mp3"
+        test_file.write_bytes(b"dummy mp3 data")
+
+        try:
+            # Gọi API đổi tên
+            rename_resp = await client.post(
+                f"/api/audio/{test_file.name}/rename",
+                json={"new_title": "Bản Thu Kiểm Thử Đổi Tên"}
+            )
+            assert rename_resp.status == 200
+            res_data = await rename_resp.json()
+            assert res_data["status"] == "success"
+            assert res_data["data"]["title"] == "Bản Thu Kiểm Thử Đổi Tên"
+
+            # Kiểm tra API library trả về tiêu đề mới
+            lib_resp = await client.get("/api/library")
+            assert lib_resp.status == 200
+            lib_data = await lib_resp.json()
+            matched = [item for item in lib_data["data"] if item["filename"] == test_file.name]
+            assert len(matched) == 1
+            assert matched[0]["title"] == "Bản Thu Kiểm Thử Đổi Tên"
+        finally:
+            # Dọn dẹp file test
+            if test_file.exists():
+                await client.delete(f"/api/audio/{test_file.name}")

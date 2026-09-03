@@ -4,6 +4,7 @@ Tuân thủ nghiêm ngặt chuẩn Clean Architecture (Tầng Presentation).
 Sử dụng aiohttp.web - thư viện bất đồng bộ mã nguồn mở (Apache-2.0).
 """
 import asyncio
+import json
 import os
 import uuid
 import webbrowser
@@ -33,9 +34,30 @@ BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
 OUTPUT_AUDIO_DIR = Path.cwd() / "output" / "audio"
 UPLOAD_DIR = Path.cwd() / "output" / "uploads"
+METADATA_FILE = OUTPUT_AUDIO_DIR / "metadata.json"
 
 OUTPUT_AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _load_metadata() -> dict:
+    """Đọc dữ liệu metadata từ metadata.json."""
+    if METADATA_FILE.exists():
+        try:
+            with open(METADATA_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_metadata(data: dict) -> None:
+    """Lưu dữ liệu metadata vào metadata.json."""
+    try:
+        with open(METADATA_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception as exc:
+        console.print(f"[yellow]Không thể lưu metadata.json: {exc}[/yellow]")
 
 
 def create_web_container() -> Tuple[ReadAndSpeakUseCase, ListVoicesUseCase, ManagePlaybackUseCase, MacAfplayAdapter]:
@@ -210,6 +232,11 @@ class WebTtsController:
             result = await self._read_and_speak_uc.execute(tts_req)
             self._job_metadata[job_id]["document_title"] = result.document_title
 
+            # Lưu tiêu đề tài liệu vào metadata.json của thư viện
+            meta_all = _load_metadata()
+            meta_all[output_filename] = {"title": result.document_title}
+            _save_metadata(meta_all)
+
             return web.json_response({
                 "status": "partial" if result.is_partial else "success",
                 "data": {
@@ -229,11 +256,16 @@ class WebTtsController:
             # Khi bị hủy giữa chừng từ API stop
             if output_file_path.exists() and output_file_path.stat().st_size > 0:
                 meta = self._job_metadata.get(job_id, {})
+                partial_title = meta.get("document_title", "Tài liệu (Một phần)")
+                meta_all = _load_metadata()
+                meta_all[output_filename] = {"title": partial_title}
+                _save_metadata(meta_all)
+
                 return web.json_response({
                     "status": "partial",
                     "data": {
                         "job_id": job_id,
-                        "document_title": meta.get("document_title", "Tài liệu (Một phần)"),
+                        "document_title": partial_title,
                         "audio_filename": output_filename,
                         "audio_url": f"/api/audio/{output_filename}",
                         "is_partial": True,
@@ -314,6 +346,7 @@ class WebTtsController:
         """API trả về danh sách toàn bộ các file audio trong thư viện."""
         audio_files = []
         try:
+            meta_all = _load_metadata()
             for file_p in sorted(OUTPUT_AUDIO_DIR.glob("*.mp3"), key=lambda p: p.stat().st_mtime, reverse=True):
                 stat = file_p.stat()
                 size_kb = stat.st_size / 1024
@@ -323,10 +356,12 @@ class WebTtsController:
                 # Trích xuất tiêu đề từ metadata hoặc tên file
                 clean_name = file_p.stem
                 is_partial = "partial" in clean_name.lower()
+                meta_item = meta_all.get(file_p.name, {})
+                title = meta_item.get("title") or clean_name.replace("tts_", "Bản thu ")
 
                 audio_files.append({
                     "filename": file_p.name,
-                    "title": clean_name.replace("tts_", "Bản thu "),
+                    "title": title,
                     "size_bytes": stat.st_size,
                     "size_formatted": size_formatted,
                     "created_at": created_str,
@@ -348,9 +383,49 @@ class WebTtsController:
 
         try:
             file_path.unlink()
+            meta_all = _load_metadata()
+            if safe_filename in meta_all:
+                meta_all.pop(safe_filename, None)
+                _save_metadata(meta_all)
             return web.json_response({"status": "success", "message": "Đã xóa tệp âm thanh thành công."})
         except Exception as exc:
             return web.json_response({"status": "error", "message": f"Không thể xóa tệp: {str(exc)}"}, status=500)
+
+    async def post_rename_audio(self, request: web.Request) -> web.Response:
+        """API đổi tên/tiêu đề hiển thị của tệp âm thanh."""
+        filename = request.match_info.get("filename", "")
+        safe_filename = Path(filename).name
+        file_path = OUTPUT_AUDIO_DIR / safe_filename
+
+        if not file_path.exists() or not file_path.is_file():
+            return web.json_response({"status": "error", "message": "Không tìm thấy tệp âm thanh cần đổi tên."}, status=404)
+
+        try:
+            body = await request.json()
+            new_title = str(body.get("new_title", "")).strip()
+        except Exception:
+            return web.json_response({"status": "error", "message": "Dữ liệu JSON không hợp lệ."}, status=400)
+
+        if not new_title:
+            return web.json_response({"status": "error", "message": "Tiêu đề mới không được để trống."}, status=400)
+
+        try:
+            meta_all = _load_metadata()
+            if safe_filename not in meta_all:
+                meta_all[safe_filename] = {}
+            meta_all[safe_filename]["title"] = new_title
+            _save_metadata(meta_all)
+
+            return web.json_response({
+                "status": "success",
+                "message": "Đã đổi tên bản thu thành công.",
+                "data": {
+                    "filename": safe_filename,
+                    "title": new_title
+                }
+            })
+        except Exception as exc:
+            return web.json_response({"status": "error", "message": f"Lỗi khi đổi tên: {str(exc)}"}, status=500)
 
     async def get_audio(self, request: web.Request) -> web.Response:
         """API stream tệp âm thanh MP3 để trình duyệt phát hoặc tải về."""
@@ -463,6 +538,7 @@ def build_web_app() -> web.Application:
     app.router.add_post("/api/stop", controller.post_stop)
     app.router.add_get("/api/library", controller.get_library)
     app.router.add_delete("/api/audio/{filename}", controller.delete_audio)
+    app.router.add_post("/api/audio/{filename}/rename", controller.post_rename_audio)
     app.router.add_get("/api/audio/{filename}", controller.get_audio)
     app.router.add_post("/api/play-mac", controller.post_play_mac)
     app.router.add_get("/api/playback/sessions", controller.get_playback_sessions)

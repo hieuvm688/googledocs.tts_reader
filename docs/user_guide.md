@@ -47,7 +47,12 @@ Hệ thống sẽ tự động kích hoạt môi trường ảo `.venv`, khởi 
 
 ### E. Thư Viện Audio (Archive Management)
 - Xem danh sách toàn bộ các file audio đã chuyển đổi với kích thước và ngày tạo.
-- Tìm kiếm theo tên tài liệu.
+- Tìm kiếm theo tên tài liệu hoặc tên file.
+- **✏️ Đổi tên bản thu (Rename):** Bấm nút `✏️ Đổi tên` để mở modal chỉnh sửa tiêu đề; tiêu đề mới hỗ trợ đầy đủ tiếng Việt có dấu và được lưu trữ đồng bộ vào `metadata.json`.
+- **🗑️ Hộp thoại xóa an toàn & Tùy chọn "Không hỏi lại":**
+  - Khi bấm `🗑️ Xóa`, một Modal Dialog hiển thị để xác nhận hành động xóa vĩnh viễn.
+  - Tích chọn ô checkbox **"Không hỏi lại lần sau"** để ghi nhớ vào trình duyệt (`localStorage`). Kể từ đó, bạn có thể xóa nhanh các bản thu chỉ với 1 click.
+  - Có thể khôi phục lại hộp thoại hỏi xác nhận bất cứ lúc nào thông qua nút **[Bật lại hỏi xác nhận]** ở thanh tiêu đề Thư viện.
 - Nghe lại ngay, tải xuống MP3, phát loa Mac hoặc xóa file khỏi ổ đĩa.
 
 ### F. Quản Lý Audio Đang Mở & Tắt Audio Chạy Nền (Active Audio Sessions & Kill Switch)
