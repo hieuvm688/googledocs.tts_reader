@@ -8,11 +8,12 @@ Dự án tuân thủ nghiêm ngặt chuẩn **Clean Architecture**, sử dụng 
 
 ## 🌟 Tính Năng Nổi Bật
 
+- **Giao diện Web React Local tiện lợi**: Khởi chạy ngay bằng `./run_web.sh`, tự động mở trình duyệt, hỗ trợ kéo thả tệp, dán link Google Docs hoặc nhập text trực tiếp, tích hợp sẵn trình phát audio đầy đủ tính năng.
 - **Đọc trực tiếp từ Google Docs**: Chỉ cần dán đường dẫn tài liệu Google Docs (chế độ người xem công khai), hệ thống tự động tải và trích xuất nội dung văn bản.
 - **Đọc tệp cục bộ**: Hỗ trợ đọc các file Word `.docx` và file `.txt` lưu trong thư mục `docx/` hoặc trên máy.
 - **Giọng đọc AI tự nhiên**: Tích hợp các giọng Neural tiếng Việt hàng đầu (`vi-VN-HoaiMyNeural` - nữ truyền cảm, `vi-VN-NamMinhNeural` - nam trầm ấm) cùng hàng trăm giọng đọc đa ngôn ngữ.
-- **Phát âm thanh tức thì trên macOS**: Sử dụng trình phát native `/usr/bin/afplay` với độ trễ bằng 0, không cần cài đặt driver âm thanh phức tạp.
-- **Kiến trúc sạch (Clean Architecture)**: Tách biệt tuyệt đối giữa Domain, Application, Infrastructure và Presentation, dễ dàng mở rộng thêm nguồn tài liệu hoặc công cụ TTS mới.
+- **Phát âm thanh tức thì trên macOS**: Hỗ trợ cả phát trực tiếp trên trình duyệt Web lẫn phát native qua `/usr/bin/afplay` với độ trễ bằng 0.
+- **Kiến trúc sạch (Clean Architecture)**: Tách biệt tuyệt đối giữa Domain, Application, Infrastructure và Presentation (CLI & Web), dễ dàng mở rộng thêm nguồn tài liệu hoặc công cụ TTS mới.
 - **Tài liệu & Chỉ thị Agent chặt chẽ**: Cung cấp đầy đủ `AGENTS.md`, `RULES.md`, `ARCHITECTURE.md` và `docs/license_compliance.md` để ngăn chặn các AI Agent tự suy diễn làm sai lệch kiến trúc.
 
 ---
@@ -27,7 +28,8 @@ gdocs_tts_reader/
 ├── README.md                  # Hướng dẫn sử dụng tổng quan
 ├── requirements.txt           # Danh mục thư viện mã nguồn mở & chứng chỉ bản quyền
 ├── pytest.ini                 # Cấu hình kiểm thử tự động
-├── run.sh                     # Script chạy nhanh tiện lợi
+├── run.sh                     # Script CLI chạy nhanh tiện lợi
+├── run_web.sh                 # Script khởi chạy Giao diện Web React Local
 ├── main.py                    # Điểm khởi động ứng dụng (Dependency Injection)
 ├── docx/                      # Thư mục lưu tài liệu dự án (.docx) & file mẫu
 │   ├── README.md
@@ -38,8 +40,10 @@ gdocs_tts_reader/
 ├── src/
 │   ├── domain/                # Hạt nhân nghiệp vụ (Entities, Ports, Exceptions)
 │   ├── application/           # Điều phối luồng nghiệp vụ (Use Cases, DTOs)
-│   ├── infrastructure/        # Cài đặt cụ thể (Google Docs, Edge-TTS, Afplay)
-│   └── presentation/          # Giao diện dòng lệnh Rich CLI
+│   ├── infrastructure/        # Cài đặt cụ thể (Google Docs, Docx, RawText, Edge-TTS, Afplay)
+│   └── presentation/          # Tầng hiển thị: Rich CLI & Web React local
+│       ├── cli/               # Giao diện dòng lệnh Terminal
+│       └── web/               # Web Server (aiohttp) & React Frontend (Glassmorphism UI)
 └── tests/                     # Bộ kiểm thử tự động (Unit & Integration tests)
 ```
 
@@ -54,7 +58,15 @@ source .venv/bin/activate
 # (Nếu tạo mới: pip install -r requirements.txt)
 ```
 
-### 2. Sử dụng lệnh nhanh qua `run.sh` hoặc `python3 main.py`
+### 2. Khởi chạy Giao Diện Web React Local (Khuyên dùng)
+Chỉ cần chạy lệnh sau, hệ thống sẽ tự động khởi động server và mở trình duyệt web:
+```bash
+./run_web.sh
+# Hoặc: ./run.sh web
+```
+- **Tính năng Web:** Giao diện trực quan hiện đại, hỗ trợ dán link Google Docs, kéo thả file `.docx`/`.txt`, hoặc nhập văn bản trực tiếp. Tích hợp sẵn trình phát âm thanh (tua nhanh/lùi, chỉnh tốc độ đọc, tải MP3 về máy, chọn giọng Hoài My/Nam Minh, lưu lịch sử gần đây).
+
+### 3. Sử dụng qua dòng lệnh Terminal (CLI)
 
 #### A. Đọc tài liệu Google Docs và phát audio ngay:
 ```bash

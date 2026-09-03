@@ -41,3 +41,21 @@ def test_google_docs_permission_denied_handling():
         with pytest.raises(DocumentPermissionDeniedError) as exc_info:
             adapter.fetch_document("https://docs.google.com/document/d/12345678901234567890/edit")
         assert "chưa được mở quyền xem" in str(exc_info.value)
+
+from src.infrastructure.document_sources.raw_text_adapter import RawTextAdapter
+
+def test_raw_text_adapter():
+    adapter = RawTextAdapter()
+    assert adapter.can_handle("text://Xin chào các bạn") is True
+    assert adapter.can_handle("https://docs.google.com") is False
+
+    doc = adapter.fetch_document("text://Xin chào Việt Nam!\nĐây là dòng thứ hai.")
+    assert doc.id == "raw_text_input"
+    assert "Xin chào Việt Nam!" in doc.title
+    assert "Đây là dòng thứ hai." in doc.content
+    assert doc.word_count > 0
+
+def test_raw_text_adapter_empty():
+    adapter = RawTextAdapter()
+    with pytest.raises(DocumentFetchError):
+        adapter.fetch_document("text://   ")

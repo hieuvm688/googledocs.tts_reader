@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Docs TTS Reader — Trình Đọc Tài Liệu AI Tự Nhiên</title>
+  <meta name="description" content="Chuyển đổi văn bản từ Google Docs hoặc tệp tin thành giọng nói AI truyền cảm, tự nhiên với Edge Neural TTS.">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/app.css">
+
+  <!-- React 18 & Babel Standalone for Seamless Local Run -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js" crossorigin></script>
+</head>
+<body class="theme-dark">
+  <div id="root">
+    <!-- Fallback loading state before React hydrates -->
+    <div class="initial-loader">
+      <div class="loader-spinner"></div>
+      <p>Đang tải giao diện Google Docs TTS Reader...</p>
+    </div>
+  </div>
+
+  <!-- React Main App Script -->
+  <script type="text/babel" src="/static/app.jsx"></script>
+</body>
+</html>

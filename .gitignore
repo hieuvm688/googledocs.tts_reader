@@ -6,4 +6,5 @@ __pycache__/
 .pytest_cache/
 *.mp3
 *.wav
+output/
 .DS_Store

@@ -11,6 +11,7 @@ from rich.prompt import Prompt
 from src.domain.exceptions.base import GDocsTtsException
 from src.infrastructure.document_sources.google_docs_url_adapter import GoogleDocsUrlAdapter
 from src.infrastructure.document_sources.docx_file_adapter import DocxFileAdapter
+from src.infrastructure.document_sources.raw_text_adapter import RawTextAdapter
 from src.infrastructure.tts_engines.edge_tts_adapter import EdgeTtsAdapter, CURATED_VIETNAMESE_VOICES
 from src.infrastructure.audio_players.mac_afplay_adapter import MacAfplayAdapter
 from src.application.dtos.tts_dtos import ReadAndSpeakRequest
@@ -24,6 +25,7 @@ def create_container():
     doc_sources = [
         GoogleDocsUrlAdapter(),
         DocxFileAdapter(),
+        RawTextAdapter(),
     ]
     tts_engine = EdgeTtsAdapter()
     audio_player = MacAfplayAdapter()
@@ -154,7 +156,19 @@ def main_entrypoint():
     # Command: interactive
     subparsers.add_parser("interactive", help="Chế độ tương tác từng bước thân thiện")
 
+    # Command: web
+    web_parser = subparsers.add_parser("web", help="Khởi chạy giao diện Web React local")
+    web_parser.add_argument("--port", type=int, default=8000, help="Cổng chạy server (mặc định: 8000)")
+    web_parser.add_argument("--host", type=str, default="127.0.0.1", help="Địa chỉ host (mặc định: 127.0.0.1)")
+    web_parser.add_argument("--no-browser", action="store_true", help="Không tự động mở trình duyệt")
+
     args = parser.parse_args()
+
+    if args.command == "web":
+        from src.presentation.web.web_server import run_web_server
+        run_web_server(host=args.host, port=args.port, open_browser=not args.no_browser)
+        return
+
     read_and_speak_uc, list_voices_uc = create_container()
 
     if args.command == "read":

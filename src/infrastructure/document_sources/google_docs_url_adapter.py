@@ -24,8 +24,8 @@ class GoogleDocsUrlAdapter(IDocumentSource):
         identifier = source_identifier.strip()
         if "docs.google.com/document/d/" in identifier:
             return True
-        # Nếu truyền trực tiếp chuỗi doc_id hợp lệ (thường > 25 ký tự chữ số gạch nối)
-        if len(identifier) > 20 and not identifier.startswith("http") and not identifier.endswith(".docx"):
+        # Nếu truyền trực tiếp chuỗi doc_id hợp lệ (chỉ gồm chữ số gạch nối/dưới >= 25 ký tự)
+        if re.match(r"^[a-zA-Z0-9-_]{25,}$", identifier):
             return True
         return False
 
