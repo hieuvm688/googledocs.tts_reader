@@ -814,31 +814,8 @@ function App() {
           </button>
         </div>
 
-        {/* Footer & Controls */}
+        {/* Footer */}
         <div className="sidebar-footer">
-          <div className="sidebar-section-title">{t.systemTitle}</div>
-          <div className="sidebar-control-row">
-            <select
-              className="sidebar-lang-select"
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-              title="Đa ngôn ngữ (11 Locales)"
-            >
-              {Object.entries(LANGUAGES).map(([code, item]) => (
-                <option key={code} value={code}>
-                  {item.flag} {item.name}
-                </option>
-              ))}
-            </select>
-            <button
-              className="sidebar-theme-btn"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              title="Theme Sáng / Tối"
-            >
-              {theme === "dark" ? "☀️" : "🌙"}
-            </button>
-          </div>
-
           <div className="system-status-box">
             <div className="status-dot-pulse"></div>
             <span>Cloud Neural Engine: Online</span>
@@ -858,10 +835,31 @@ function App() {
                 : `Hệ thống lưu trữ ${libraryFiles.length} bản ghi âm thanh`}
             </p>
           </div>
-          <div className="top-bar-tags">
-            <span className="tag-badge">⚡ Parallel TTS 3x</span>
-            <span className="tag-badge">🌐 11 Locales</span>
-            <span className="tag-badge">🔒 100% Private</span>
+
+          {/* Top Right Controls: Multilanguage & Dark Mode */}
+          <div className="top-bar-actions">
+            {/* Multi-language Selector */}
+            <select
+              className="top-bar-lang-select"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              title="Đổi ngôn ngữ giao diện (Multilanguage - 11 Ngôn ngữ)"
+            >
+              {Object.entries(LANGUAGES).map(([code, item]) => (
+                <option key={code} value={code}>
+                  {item.flag} {item.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Dark / Light Mode Toggle */}
+            <button
+              className="top-bar-theme-btn"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              title="Chuyển chế độ Sáng / Tối"
+            >
+              <span>{theme === "dark" ? "☀️ Sáng" : "🌙 Tối"}</span>
+            </button>
           </div>
         </div>
 
