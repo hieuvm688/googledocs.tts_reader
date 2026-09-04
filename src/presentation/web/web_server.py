@@ -523,6 +523,13 @@ class WebTtsController:
         """Health check endpoint."""
         return web.json_response({"status": "ok", "service": "gdocs_tts_reader"})
 
+    async def get_favicon(self, request: web.Request) -> web.Response:
+        """Phục vụ file favicon logo bo tròn cho trình duyệt & Mobile address bar."""
+        favicon_file = STATIC_DIR / "favicon.ico"
+        if favicon_file.exists():
+            return web.FileResponse(favicon_file, headers={"Content-Type": "image/x-icon", "Cache-Control": "public, max-age=86400"})
+        return web.Response(status=404)
+
 
 def build_web_app() -> web.Application:
     """Xây dựng ứng dụng aiohttp web với đầy đủ router và DI."""
@@ -547,6 +554,9 @@ def build_web_app() -> web.Application:
 
     # Static UI routes
     app.router.add_get("/", controller.get_index)
+    app.router.add_get("/favicon.ico", controller.get_favicon)
+    app.router.add_get("/apple-touch-icon.png", controller.get_favicon)
+    app.router.add_get("/apple-touch-icon-precomposed.png", controller.get_favicon)
     if STATIC_DIR.exists():
         app.router.add_static("/static/", path=STATIC_DIR, name="static")
 

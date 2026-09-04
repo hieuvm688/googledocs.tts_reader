@@ -1029,7 +1029,9 @@ function App() {
       <aside className="app-sidebar">
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="sidebar-logo">🎙️</div>
+          <div className="sidebar-logo">
+            <img src="/static/logo.jpg" alt="GDocs Studio Logo" className="sidebar-logo-img" />
+          </div>
           <div className="sidebar-title-box">
             <span className="sidebar-title">GDocs Studio</span>
             <span className="sidebar-badge">Enterprise v2.2</span>
