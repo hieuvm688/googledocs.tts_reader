@@ -59,41 +59,56 @@ CURATED_MULTILINGUAL_VOICES = [
 CURATED_VIETNAMESE_VOICES = [v for v in CURATED_MULTILINGUAL_VOICES if v.locale.startswith("vi")]
 
 
-def split_text_into_chunks(text: str, max_words_per_chunk: int = 150) -> List[str]:
-    """Phân tách văn bản dài thành các đoạn tự nhiên để xử lý song song siêu tốc."""
-    raw_paragraphs = [p.strip() for p in text.split("\n") if p.strip()]
-    if not raw_paragraphs:
-        return [text] if text.strip() else []
+import re
+
+def split_text_into_chunks(text: str, max_chars_per_chunk: int = 1000, max_words_per_chunk: Optional[int] = None) -> List[str]:
+    """Phân tách văn bản dài thành các đoạn tự nhiên (< 1000 ký tự) để xử lý song song siêu tốc."""
+    if not text or not text.strip():
+        return []
+
+    # Tách theo ngắt câu tự nhiên (\n, . , ? , ! , ;)
+    raw_blocks = re.split(r'(\n+|\.\s+|\?\s+|\!\s+|\;\s+)', text)
+    sentences: List[str] = []
+    temp_sent = ""
+    for b in raw_blocks:
+        temp_sent += b
+        if len(temp_sent) >= 100 or any(delims in b for delims in ['\n', '.', '?', '!', ';']):
+            if temp_sent.strip():
+                sentences.append(temp_sent.strip())
+            temp_sent = ""
+    if temp_sent.strip():
+        sentences.append(temp_sent.strip())
 
     chunks: List[str] = []
-    current_chunk: List[str] = []
-    current_words = 0
+    current_chunk = ""
 
-    for p in raw_paragraphs:
-        p_words = len(p.split())
-        # Nếu một đoạn quá dài (> 200 từ), tách tiếp theo dấu chấm câu
-        if p_words > max_words_per_chunk:
-            sentences = [s.strip() for s in p.replace(". ", ".\n").split("\n") if s.strip()]
-            for s in sentences:
-                s_words = len(s.split())
-                if current_words + s_words > max_words_per_chunk and current_chunk:
-                    chunks.append(" ".join(current_chunk))
-                    current_chunk = [s]
-                    current_words = s_words
+    for sentence in sentences:
+        if len(sentence) > max_chars_per_chunk:
+            if current_chunk:
+                chunks.append(current_chunk)
+                current_chunk = ""
+            
+            # Tách tiếp theo từ nếu câu đơn lẻ quá dài (> 1000 ký tự)
+            words = sentence.split()
+            sub_chunk = ""
+            for w in words:
+                if len(sub_chunk) + len(w) + 1 > max_chars_per_chunk:
+                    if sub_chunk:
+                        chunks.append(sub_chunk)
+                    sub_chunk = w
                 else:
-                    current_chunk.append(s)
-                    current_words += s_words
+                    sub_chunk = (sub_chunk + " " + w).strip()
+            if sub_chunk:
+                current_chunk = sub_chunk
         else:
-            if current_words + p_words > max_words_per_chunk and current_chunk:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = [p]
-                current_words = p_words
+            if len(current_chunk) + len(sentence) + 1 > max_chars_per_chunk:
+                chunks.append(current_chunk)
+                current_chunk = sentence
             else:
-                current_chunk.append(p)
-                current_words += p_words
+                current_chunk = (current_chunk + " " + sentence).strip()
 
     if current_chunk:
-        chunks.append(" ".join(current_chunk))
+        chunks.append(current_chunk)
 
     return chunks if chunks else [text]
 
@@ -101,7 +116,7 @@ def split_text_into_chunks(text: str, max_words_per_chunk: int = 150) -> List[st
 class EdgeTtsAdapter(ITtsEngine):
     """Hiện thực hóa cổng TTS Engine bằng thư viện edge-tts với Parallel Synthesis."""
 
-    def __init__(self, max_concurrency: int = 3):
+    def __init__(self, max_concurrency: int = 4):
         self._max_concurrency = max_concurrency
 
     async def _synthesize_single_chunk(
@@ -110,20 +125,34 @@ class EdgeTtsAdapter(ITtsEngine):
         chunk_text: str,
         voice_id: str,
         rate: str,
-        pitch: str
+        pitch: str,
+        retries: int = 3
     ) -> bytes:
-        """Tổng hợp một đoạn văn bản thành byte audio MP3."""
+        """Tổng hợp một đoạn văn bản thành byte audio MP3 với tự động thử lại khi gặp sự cố mạng."""
         async with sem:
-            comm = edge_tts.Communicate(text=chunk_text, voice=voice_id, rate=rate, pitch=pitch)
-            buf = bytearray()
-            stream_iter = comm.stream()
-            try:
-                async for item in stream_iter:
-                    if item.get("type") == "audio" and "data" in item:
-                        buf.extend(item["data"])
-            finally:
-                await stream_iter.aclose()
-            return bytes(buf)
+            last_exc = None
+            for attempt in range(retries):
+                try:
+                    comm = edge_tts.Communicate(text=chunk_text, voice=voice_id, rate=rate, pitch=pitch)
+                    buf = bytearray()
+                    stream_iter = comm.stream()
+                    try:
+                        async for item in stream_iter:
+                            if item.get("type") == "audio" and "data" in item:
+                                buf.extend(item["data"])
+                    finally:
+                        await stream_iter.aclose()
+
+                    if len(buf) > 0:
+                        return bytes(buf)
+                except Exception as exc:
+                    last_exc = exc
+                    if attempt < retries - 1:
+                        await asyncio.sleep(0.5)
+
+            if last_exc:
+                raise last_exc
+            return b""
 
     async def synthesize(
         self,
@@ -144,7 +173,7 @@ class EdgeTtsAdapter(ITtsEngine):
             dest_file = output_path
             dest_file.parent.mkdir(parents=True, exist_ok=True)
 
-        chunks = split_text_into_chunks(text, max_words_per_chunk=150)
+        chunks = split_text_into_chunks(text, max_chars_per_chunk=1000)
         sem = asyncio.Semaphore(self._max_concurrency)
 
         is_partial = False

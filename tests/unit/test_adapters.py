@@ -94,3 +94,13 @@ def test_mac_afplay_adapter_file_not_found(tmp_path):
     with pytest.raises(AudioPlaybackError):
         adapter.play(track)
 
+from src.infrastructure.tts_engines.edge_tts_adapter import split_text_into_chunks
+
+def test_split_text_into_chunks_long_text():
+    # Test 100,000+ characters without newlines or periods
+    big_text = "Từ " * 35000
+    chunks = split_text_into_chunks(big_text, max_chars_per_chunk=1000)
+    assert len(chunks) > 100
+    assert all(len(c) <= 1000 for c in chunks)
+
+

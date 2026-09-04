@@ -8,3 +8,5 @@ __pycache__/
 *.wav
 output/
 .DS_Store
+
+serveo_key*
